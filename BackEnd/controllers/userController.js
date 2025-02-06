@@ -83,4 +83,22 @@ const getUserById = async (req, res) => {
     }
   };
 
-export { registerUser, loginUser, logOutUser, getUserSession, updateUser, getUserById };
+// 📌 Guardar o actualizar credenciales de email
+const updateEmailConfig = async (req, res) => {
+  try {
+    const { service, user, pass } = req.body;
+    const adminId = req.user._id;
+
+    const admin = await User.findById(adminId);
+    if (!admin || admin.role !== "admin") return res.status(403).json({ message: "Acceso denegado" });
+
+    admin.emailConfig = { service, user, pass };
+    await admin.save();
+
+    res.status(200).json({ message: "Credenciales de email actualizadas" });
+  } catch (error) {
+    res.status(500).json({ message: "Error al actualizar credenciales" });
+  }
+};
+
+export { registerUser, loginUser, logOutUser, getUserSession, updateUser, getUserById, updateEmailConfig };

@@ -1,18 +1,28 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddleware';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { adminMiddleware } from '../middlewares/adminMiddleware.js';
 
-const appointmentRouter = express.Router();
+import { 
+  requestAppointment, 
+  cancelAppointment, 
+  getPatientAppointments, 
+  getAllAppointments, 
+  getAppointmentsByPatient, 
+  scheduleAppointment, 
+  updateAppointmentStatus 
+} from '../controllers/appointmentController.js';
 
-router.post("/", authMiddleware, (req, res) => {
-    res.json({ message: "Turno agendado con éxito" });
-  });
-  
-  router.put("/:id", authMiddleware, (req, res) => {
-    res.json({ message: "Turno modificado con éxito" });
-  });
-  
-  router.delete("/:id", authMiddleware, (req, res) => {
-    res.json({ message: "Turno eliminado con éxito" });
-  });
-  
-  export { appointmentRouter };
+const appointmentRoutes = express.Router();
+
+// 📌 Rutas de paciente
+appointmentRoutes.post("/", authMiddleware, requestAppointment);
+appointmentRoutes.delete("/:id", authMiddleware, cancelAppointment);
+appointmentRoutes.get("/", authMiddleware, getPatientAppointments);
+
+// 📌 Rutas de profesional (admin)
+appointmentRoutes.get("/all", authMiddleware, adminMiddleware, getAllAppointments);
+appointmentRoutes.get("/patient/:id", authMiddleware, adminMiddleware, getAppointmentsByPatient);
+appointmentRoutes.post("/schedule", authMiddleware, adminMiddleware, scheduleAppointment);
+appointmentRoutes.put("/:id/status", authMiddleware, adminMiddleware, updateAppointmentStatus);
+
+export { appointmentRoutes };

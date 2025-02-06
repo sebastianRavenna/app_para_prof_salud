@@ -1,11 +1,13 @@
 import express from 'express';
 /* import cors from 'cors'; */
 import { connectDB } from './config/connectDB.js'
-import { userRoutes } from './routes/userRoutes.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
-
+import { userRoutes } from './routes/userRoutes.js';
+import { appointmentRoutes } from './routes/appointmentRoutes.js';
+import {sendReminders } from './controllers/appointmentController.js'
 process.loadEnvFile();
+
 
 const PORT = process.env.PORT;
 const app = express();
@@ -26,10 +28,16 @@ app.use(
     })
 );
 
+setInterval(() => {
+    sendReminders();
+  }, 24 * 60 * 60 * 1000); // Ejecuta cada 24 horas
+
 app.use('/api/users', userRoutes);
-/*app.use("/api/appointments", require("./routes/appointmentRoutes"));
-app.use("/api/articles", require("./routes/articleRoutes"));
+app.use("/api/appointments", appointmentRoutes);
+
+/*app.use("/api/articles", require("./routes/articleRoutes"));
  */
+
 
 app.listen(PORT, () => {
     console.log('Server is running');

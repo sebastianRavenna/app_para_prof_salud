@@ -1,10 +1,18 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddleware';
+import authMiddleware from '../middleware/authMiddleware.js';
+import { 
+  getAllArticles, 
+  createArticle, 
+  updateArticle, 
+  deleteArticle 
+} from '../controllers/articleController';
 
 const articleRouter = express.Router();
 
-articleRouter.post("/create", authMiddleware, (req, res) => {
-  res.json({ message: "Artículo creado con éxito" });
-});
+articleRouter.get("/", getAllArticles);
+articleRouter.post("/", authMiddleware, createArticle);
+articleRouter.put("/:id", authMiddleware, updateArticle);
+articleRouter.delete("/:id", authMiddleware, deleteArticle);
+
 
 export { articleRouter }

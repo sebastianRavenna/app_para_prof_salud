@@ -6,6 +6,11 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["admin", "patient"], default: "patient" }, // Rol del usuario
+  emailConfig: {
+    service: { type: String, default: "gmail" },
+    user: { type: String, default: "" },
+    pass: { type: String, default: "" },
+  },  
 });
 
 // Antes de guardar, encriptamos la contraseña
