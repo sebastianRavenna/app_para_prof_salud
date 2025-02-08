@@ -1,18 +1,18 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddleware.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { 
   getAllArticles, 
   createArticle, 
   updateArticle, 
   deleteArticle 
-} from '../controllers/articleController';
+} from '../controllers/articleController.js';
 
-const articleRouter = express.Router();
+const articleRoutes = express.Router();
 
-articleRouter.get("/", getAllArticles);
-articleRouter.post("/", authMiddleware, createArticle);
-articleRouter.put("/:id", authMiddleware, updateArticle);
-articleRouter.delete("/:id", authMiddleware, deleteArticle);
+articleRoutes.get("/", getAllArticles);
+articleRoutes.post("/", authMiddleware, createArticle);
+articleRoutes.put("/:id", authMiddleware, updateArticle);
+articleRoutes.delete("/:id", authMiddleware, deleteArticle);
 
 
-export { articleRouter }
+export { articleRoutes }

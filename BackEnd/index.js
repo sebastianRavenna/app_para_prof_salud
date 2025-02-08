@@ -1,11 +1,12 @@
 import express from 'express';
-/* import cors from 'cors'; */
+import cors from 'cors';
 import { connectDB } from './config/connectDB.js'
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import { userRoutes } from './routes/userRoutes.js';
 import { appointmentRoutes } from './routes/appointmentRoutes.js';
-import {sendReminders } from './controllers/appointmentController.js'
+import { articleRoutes } from './routes/articleRoutes.js';
+import { sendReminders } from './controllers/appointmentController.js'
 process.loadEnvFile();
 
 
@@ -13,7 +14,12 @@ const PORT = process.env.PORT;
 const app = express();
 
 app.use(express.json());
-/* app.use(cors()); */
+app.use(
+    cors({
+      origin: "http://localhost:5173", // Solo permite tu frontend
+      credentials: true, // Permite enviar cookies y headers de autenticación
+    })
+  );
 
 app.use(
     session({
@@ -34,9 +40,8 @@ setInterval(() => {
 
 app.use('/api/users', userRoutes);
 app.use("/api/appointments", appointmentRoutes);
+app.use("/api/articles", articleRoutes);
 
-/*app.use("/api/articles", require("./routes/articleRoutes"));
- */
 
 
 app.listen(PORT, () => {

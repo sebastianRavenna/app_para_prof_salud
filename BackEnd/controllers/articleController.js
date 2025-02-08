@@ -1,4 +1,4 @@
-import { Article } from '../models/Article';
+import { Article } from "../models/articleModel.js";
 
 // 📌 Obtener todos los artículos (público)
 const getAllArticles = async (req, res) => {
@@ -55,7 +55,7 @@ const deleteArticle = async (req, res) => {
   }
 };
 
-exports = { 
+export { 
     getAllArticles, 
     createArticle, 
     updateArticle, 
