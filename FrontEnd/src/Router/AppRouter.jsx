@@ -4,8 +4,10 @@ import { Login } from "../pages/Login";
 import { Home } from "../pages/Home";
 import { NotFound } from "../pages/NotFound";
 import { Dashboard } from "../pages/Dashboard";
-/* import Register from "../pages/Register";
- */
+import { Register } from "../pages/Register";
+/* import { Appointments } from "./pages/Appointments";
+import { AdminPanel } from "./pages/AdminPanel"; */
+import { ProtectedRoute } from "../components/ProtectedRoute"
 const AppRouter = () => {
     return (
        <AuthProvider>
@@ -13,8 +15,14 @@ const AppRouter = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/Login" element={<Login />} />
-                    <Route path="/Dashboard" element={<Dashboard />} />
-                     
+                    <Route path="/Register" element={<Register />} />
+
+                    {/* 🔒 Protegemos rutas */}
+                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    {/* <Route path="/appointments" element={<ProtectedRoute role="patient"><Appointments /></ProtectedRoute>} />
+                    <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} /> */}
+                          
+
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </BrowserRouter>
