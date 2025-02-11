@@ -8,15 +8,16 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const {login} = useContext(AuthContext);
   const navigate = useNavigate();
-  
+  const [message, setMessage] = useState("");
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate("/dashboard"); // Redirige después del login
+      navigate("/appointments"); // Redirige después del login
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
+      setMessage("❌ Error en el usuario y/o la contraseña.");
     }
   };
 

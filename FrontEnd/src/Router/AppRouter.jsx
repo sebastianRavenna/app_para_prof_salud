@@ -5,8 +5,8 @@ import { Home } from "../pages/Home";
 import { NotFound } from "../pages/NotFound";
 import { Dashboard } from "../pages/Dashboard";
 import { Register } from "../pages/Register";
-/* import { Appointments } from "./pages/Appointments";
-import { AdminPanel } from "./pages/AdminPanel"; */
+import { Appointments } from "../pages/Appointment";
+/*import { AdminPanel } from "./pages/AdminPanel"; */
 import { ProtectedRoute } from "../components/ProtectedRoute"
 const AppRouter = () => {
     return (
@@ -19,8 +19,8 @@ const AppRouter = () => {
 
                     {/* 🔒 Protegemos rutas */}
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                    {/* <Route path="/appointments" element={<ProtectedRoute role="patient"><Appointments /></ProtectedRoute>} />
-                    <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} /> */}
+                    <Route path="/appointments" element={<ProtectedRoute role="patient"><Appointments /></ProtectedRoute>} />
+                    {/* <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} /> */}
                           
 
                     <Route path="*" element={<NotFound />} />

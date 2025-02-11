@@ -15,6 +15,7 @@ const Layout = ({ children }) => {
               <Link to="/dashboard" className="navbar-item"> Dashboard </Link> 
               <Link to="/login" className="navbar-item"> Login </Link> 
               <Link to="/register" className="navbar-item"> Register </Link> 
+              <Link to="/appointments" className="navbar-item"> Appointments </Link> 
             </div> 
           </div> 
         </nav> 

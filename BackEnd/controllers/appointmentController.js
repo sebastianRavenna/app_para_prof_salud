@@ -6,9 +6,14 @@ import { User } from '../models/userModel.js'
 // 📌 1️⃣ Paciente solicita un turno
 const requestAppointment = async (req, res) => {
     try {
+      console.log("Sesión actual:", req.session);
+      console.log("Body recibido:", req.body);
+      if (!req.session.user) {
+        return res.status(401).json({ message: "No autorizado. Falta autenticación." });
+      }
       const { date, reason } = req.body;
-      const patientId = req.user._id;
-  
+      const patientId = req.session.user.id;
+
       const newAppointment = new Appointment({ patient: patientId, date, reason });
       await newAppointment.save();
       
@@ -24,6 +29,7 @@ const requestAppointment = async (req, res) => {
     
       res.status(201).json({ message: "Turno solicitado", appointment: newAppointment });
     } catch (error) {
+      console.error("Error en createAppointment:", error);
       res.status(500).json({ message: "Error al solicitar turno" });
     }
   };
@@ -55,15 +61,25 @@ const cancelAppointment = async (req, res) => {
   
   // 📌 Paciente ve sus turnos
   const getPatientAppointments = async (req, res) => {
+    console.log("\n🔍 Debug getPatientAppointments:");
+    console.log("Session:", req.session);
+    console.log("User in session:", req.session.user);
+
     try {
-      const patientId = req.user._id;
-      const appointments = await Appointment.find({ patient: patientId });
-  
-      res.status(200).json(appointments);
-    } catch (error) {
-      res.status(500).json({ message: "Error al obtener turnos" });
-    }
-  };
+      if (!req.session.user) {
+          console.log("❌ No hay usuario en sesión");
+          return res.status(401).json({ message: "No autorizado" });
+      }
+
+      const appointments = await Appointment.find({ patient: req.session.user.id });
+      console.log("✅ Appointments encontrados:", appointments);
+      
+      return res.json(appointments);
+  } catch (error) {
+      console.error("❌ Error:", error);
+      return res.status(500).json({ message: "Error al obtener turnos" });
+  }
+};
   
   // 📌 Profesional ve todos los turnos de todos los pacientes
   const getAllAppointments = async (req, res) => {

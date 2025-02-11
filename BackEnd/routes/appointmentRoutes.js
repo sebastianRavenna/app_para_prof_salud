@@ -17,7 +17,7 @@ const appointmentRoutes = express.Router();
 // 📌 Rutas de paciente
 appointmentRoutes.post("/", authMiddleware, requestAppointment);
 appointmentRoutes.delete("/:id", authMiddleware, cancelAppointment);
-appointmentRoutes.get("/", authMiddleware, getPatientAppointments);
+appointmentRoutes.get("/user", authMiddleware, getPatientAppointments);
 
 // 📌 Rutas de profesional (admin)
 appointmentRoutes.get("/all", authMiddleware, adminMiddleware, getAllAppointments);
@@ -25,4 +25,5 @@ appointmentRoutes.get("/patient/:id", authMiddleware, adminMiddleware, getAppoin
 appointmentRoutes.post("/schedule", authMiddleware, adminMiddleware, scheduleAppointment);
 appointmentRoutes.put("/:id/status", authMiddleware, adminMiddleware, updateAppointmentStatus);
 
+console.log("🔹 appointmentRoutes cargado correctamente");
 export { appointmentRoutes };

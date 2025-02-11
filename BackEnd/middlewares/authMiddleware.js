@@ -1,7 +1,10 @@
 const authMiddleware = (req, res, next) => {
-    if (!req.session.user) return res.status(401).json({ message: "Acceso no autorizado" });
-    next();
+  console.log("Sesión actual:", req.session); // 🔹 Debug
+    if (req.session.user) {
+      next();
+    } else {return res.status(401).json({ message: "Acceso no autorizado" });
   };
   
+}
 export { authMiddleware };
   
