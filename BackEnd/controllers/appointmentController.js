@@ -37,21 +37,27 @@ const requestAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
     try {
       const { id } = req.params;
+      console.log("id del turno: " + id)
       const appointment = await Appointment.findById(id);
+
+      console.log("TURNO: " + appointment)
+
+      console.log("id paciente en el turno: " + appointment.patient.toString())
+      console.log("id paciente: " + req.session.user.id)
   
       if (!appointment) return res.status(404).json({ message: "Turno no encontrado" });
-      if (appointment.patient.toString() !== req.user._id.toString()) {
+      if (appointment.patient.toString() !== (req.session.user.id).toString()) {
         return res.status(403).json({ message: "No autorizado para cancelar este turno" });
       }
   
       await Appointment.findByIdAndDelete(id);
 
       //envio de mail
-      await sendEmail(
+      /* await sendEmail(
         appointment.patient.email,
         "Turno Cancelado",
         emailTemplates.appointmentCancelled(appointment.patient.username, appointment.date.toLocaleString("es-AR"))
-      );
+      ); */
 
       res.status(200).json({ message: "Turno cancelado" });
     } catch (error) {

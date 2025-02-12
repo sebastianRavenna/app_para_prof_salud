@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate("/appointments"); // Redirige después del login
+      navigate("/dashboard"); // Redirige después del login
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setMessage("❌ Error en el usuario y/o la contraseña.");
