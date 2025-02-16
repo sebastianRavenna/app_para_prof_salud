@@ -3,10 +3,12 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children, role }) => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
 
-  if (!user) return <Navigate to="/login" />;
-  if (role && user.role !== role) return <Navigate to="/" />;
+  if (loading) return <p>Cargando...</p>;  // Evita redirigir antes de saber el estado
+
+  if (!user) return <Navigate to="/" />;
+  if (role && user.role !== role) return <Navigate to="/appointments" />;
 
   return children;
 };

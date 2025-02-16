@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
@@ -6,15 +6,21 @@ import { Layout } from "../components/Layout";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const {login} = useContext(AuthContext);
-  const navigate = useNavigate();
+  const {login, user} = useContext(AuthContext);
   const [message, setMessage] = useState("");
-  
+  const navigate = useNavigate(); 
+
+  useEffect(() => {
+    if (user) {
+      navigate("/appointments"); // 🔹 Redirigir si el usuario ya está autenticado
+    }
+  }, [user, navigate]);
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
-      navigate("/dashboard"); // Redirige después del login
+      await login(email, password, navigate);
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setMessage("❌ Error en el usuario y/o la contraseña.");
@@ -62,9 +68,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button className="button is-primary is-fullwidth">Ingresar</button>
-{/*           <button onClick={testConnection} className="button is-warning">Probar Backend</button> */}
-
+          <button type="submit" className="button is-primary is-fullwidth">Ingresar</button>
         </form>
       </div>
     </div>

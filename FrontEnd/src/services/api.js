@@ -26,7 +26,7 @@
     };
 
     // 📌 Ruta de paciente
-    const getPatientAppointments = async (token) => {
+    const getPatientAppointments = async () => {
         try {
             console.log("🔍 Iniciando petición GET appointments");
             // Asegúrate de que la ruta coincida exactamente con el backend

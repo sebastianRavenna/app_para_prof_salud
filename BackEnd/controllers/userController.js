@@ -29,6 +29,7 @@ const loginUser = async (req, res) => {
 
     // Guardamos la sesión del usuario
     req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role };
+    console.log("datos de sesion: ", req.session.user)
 
     res.status(200).json({ message: "Inicio de sesión exitoso", userId: user._id });
   } catch (error) {

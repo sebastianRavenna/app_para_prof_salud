@@ -1,7 +1,14 @@
-import { Link } from "react-router-dom"; 
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+ 
+
 
 const Layout = ({ children }) => { 
-  
+  const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
+
   return ( 
     <> 
       <header> 
@@ -12,10 +19,18 @@ const Layout = ({ children }) => {
           <div className="navbar-menu"> 
             <div className="navbar-start"> 
               <Link to="/" className="navbar-item"> Home </Link> 
-              <Link to="/dashboard" className="navbar-item"> Dashboard </Link> 
-              <Link to="/login" className="navbar-item"> Login </Link> 
-              <Link to="/register" className="navbar-item"> Register </Link> 
+            <div className="navbar-end"> 
+            {user ? (
+              <>
               <Link to="/appointments" className="navbar-item"> Appointments </Link> 
+              <button className="button is-light" onClick={ () => logout(navigate)}>
+                    Logout
+              </button>   
+            </>
+            ) : ( 
+              <Link to="/login" className="navbar-item"> Login </Link> 
+            )}
+            </div> 
             </div> 
           </div> 
         </nav> 

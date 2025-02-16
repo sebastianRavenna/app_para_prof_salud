@@ -11,6 +11,7 @@ const requestAppointment = async (req, res) => {
       if (!req.session.user) {
         return res.status(401).json({ message: "No autorizado. Falta autenticación." });
       }
+      
       const { date, reason } = req.body;
       const patientId = req.session.user.id;
 
