@@ -25,5 +25,4 @@ appointmentRoutes.get("/patient/:id", authMiddleware, adminMiddleware, getAppoin
 appointmentRoutes.post("/schedule", authMiddleware, adminMiddleware, scheduleAppointment);
 appointmentRoutes.put("/:id/status", authMiddleware, adminMiddleware, updateAppointmentStatus);
 
-console.log("🔹 appointmentRoutes cargado correctamente");
 export { appointmentRoutes };

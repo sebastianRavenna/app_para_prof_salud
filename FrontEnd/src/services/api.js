@@ -10,13 +10,14 @@
         }
     });
 
-    const requestAppointment = async (date, reason, token) => {
+        // 📌 Paciente solicita un turno
+    const requestAppointment = async (date, reason, /* token */) => {
         const res = await fetch(`${API_URL}/appointments/`, {
         method: "POST",
-        credentials: "include", // 👈 Agregado
+        credentials: "include", 
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            /* Authorization: `Bearer ${token}`, */
         },
         body: JSON.stringify({ date, reason }),
         });
@@ -25,13 +26,10 @@
         return res.json();
     };
 
-    // 📌 Ruta de paciente
+    // 📌 Paciente ve sus turnos
     const getPatientAppointments = async () => {
         try {
-            console.log("🔍 Iniciando petición GET appointments");
-            // Asegúrate de que la ruta coincida exactamente con el backend
             const response = await api.get('/appointments/user');
-            console.log("✅ Respuesta:", response);
             return response.data;
         } catch (error) {
             console.log("❌ Error completo:", error);
@@ -39,34 +37,41 @@
             console.log("❌ Response status:", error.response?.status);
             throw error;
         }
-        
-        /* const res = await axios.get(`${API_URL}/appointments/`, {
-        withCredentials: true, // 👈 Agregado
-        headers: { Authorization: `Bearer ${token}` },
-        });
-        return res.data; */
     }; 
 
 
-// 📌 Ruta de profesional (admin)
-   /* const getAppointments = async (token) => {
+    // Profesional (admin) ve la hist clinica
+    const getClinicalHistory = async (userId) => {
+        console.log("Solicitando historia clínica para el usuario:", userId);
+        const res = await axios.get(`${API_URL}/clinical-history/${userId}`, {
+            withCredentials: true, 
+            /* credentials: "include",
+            headers: { "Content-Type": "application/json", }, */
+        });
+        return res.data;
+    };
+  
+    // Profesional (admin) actualiza la hist clinica
+    const addNote = async (userId, note) => {
+        const res = await axios.post(`${API_URL}/clinical-history/${userId}/note`, { note }, {
+            withCredentials: true, 
+            credentials: "include",
+            headers: { "Content-Type": "application/json", },
+        });
+        return res.data;
+    };
+  
+    // Profesional (admin) ve todos los turnos
+   const getAllAppointments = async () => {
         try {
-            console.log("🔍 Iniciando petición GET appointments");
-            const response = await api.get('/appointments/user');
-            console.log("✅ Respuesta:", response);
-            return response.data;
-             const response = await fetch(`${API_URL}/appointments/user`, {
+            const response = await fetch(`${API_URL}/appointments/all`, {
             method: "GET",
-            credentials: "include", // IMPORTANTE: Permite enviar la cookie de sesión
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": `Bearer ${token}`
-            },
+            credentials: "include",
+            headers: { "Content-Type": "application/json", },
             });
             if (!response.ok) {
                 throw new Error("Error al obtener turnos");
             }
-            
             return await response.json(); 
         } catch (error) {
             console.log("❌ Error completo:", error);
@@ -74,14 +79,23 @@
             console.log("❌ Response status:", error.response?.status); 
             throw error;
         }
-    };*/
+    };
 
-
-    const cancelAppointment = async (appointmentId, token) => {
+    // Cancelacion de turno (paciente y profesional)
+    const cancelAppointment = async (appointmentId) => {
         await axios.delete(`${API_URL}/appointments/${appointmentId}`, {
-            withCredentials: true, // 👈 Agregado
-            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true, 
+            credentials: "include",
+            headers: { "Content-Type": "application/json", },
         });
     };
 
-    export { api, /* getAppointments, */ requestAppointment, getPatientAppointments, cancelAppointment };
+    export { 
+        api, 
+        requestAppointment, 
+        getPatientAppointments, 
+        getClinicalHistory, 
+        addNote, 
+        getAllAppointments, 
+        cancelAppointment 
+    };

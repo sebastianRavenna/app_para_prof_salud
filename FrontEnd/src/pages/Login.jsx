@@ -12,7 +12,11 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/appointments"); // 🔹 Redirigir si el usuario ya está autenticado
+      if (user.role === "admin") {
+        navigate("/admin"); // Redirige a la página del Admin
+      } else {
+        navigate("/appointments"); // Redirige a los turnos si no es admin
+      }
     }
   }, [user, navigate]);
 

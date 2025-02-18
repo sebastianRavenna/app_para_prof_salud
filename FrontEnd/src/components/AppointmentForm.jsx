@@ -1,12 +1,14 @@
 import { useState, useContext } from "react";
 import { requestAppointment } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AppointmentForm = () => {
   const { token } = useContext(AuthContext);
   const [date, setDate] = useState("");
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,10 +18,14 @@ const AppointmentForm = () => {
     }
 
     try {
-      await requestAppointment(date, reason, token);
+      const response = await requestAppointment(date, reason, token);
+      if (response.data && response.data.appointment) {
+        addAppointment(response.data.appointment);
+      }
       setMessage("✅ Turno solicitado correctamente.");
       setDate("");
       setReason("");
+      navigate("/dashboard")
     } catch (error) {
       setMessage("❌ Error al solicitar el turno.");
     }

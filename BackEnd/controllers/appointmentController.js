@@ -2,19 +2,29 @@ import { Appointment } from '../models/appointmentModel.js';
 import { sendEmail } from '../config/email.js';
 import { emailTemplates } from '../utils/emailTemplates.js';
 import { User } from '../models/userModel.js'
+import { ClinicalHistory } from '../models/clinicalHistoryModel.js';
 
 // 📌 1️⃣ Paciente solicita un turno
 const requestAppointment = async (req, res) => {
     try {
-      console.log("Sesión actual:", req.session);
+/*       console.log("Sesión actual:", req.session);
       console.log("Body recibido:", req.body);
-      if (!req.session.user) {
+ */      if (!req.session.user) {
         return res.status(401).json({ message: "No autorizado. Falta autenticación." });
       }
       
       const { date, reason } = req.body;
       const patientId = req.session.user.id;
 
+      let history = await ClinicalHistory.findOne({ user: patientId });
+
+      if (!history) {
+        // Si no existe, la creamos
+        history = new ClinicalHistory({ user: patientId });
+        await history.save();
+        console.log("✅ Historia clínica creada para el usuario:", patientId);
+      }
+    
       const newAppointment = new Appointment({ patient: patientId, date, reason });
       await newAppointment.save();
       
@@ -30,7 +40,6 @@ const requestAppointment = async (req, res) => {
     
       res.status(201).json({ message: "Turno solicitado", appointment: newAppointment });
     } catch (error) {
-      console.error("Error en createAppointment:", error);
       res.status(500).json({ message: "Error al solicitar turno" });
     }
   };
@@ -38,16 +47,16 @@ const requestAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
     try {
       const { id } = req.params;
-      console.log("id del turno: " + id)
       const appointment = await Appointment.findById(id);
 
-      console.log("TURNO: " + appointment)
+      if (!appointment) {
+        return res.status(404).json({ message: "Turno no encontrado" });
+      }
 
-      console.log("id paciente en el turno: " + appointment.patient.toString())
-      console.log("id paciente: " + req.session.user.id)
-  
-      if (!appointment) return res.status(404).json({ message: "Turno no encontrado" });
-      if (appointment.patient.toString() !== (req.session.user.id).toString()) {
+      const isPatient = appointment.patient.toString() === req.session.user.id;
+      const isAdmin = req.session.user.role === "admin";
+
+      if (!isPatient && !isAdmin){
         return res.status(403).json({ message: "No autorizado para cancelar este turno" });
       }
   
@@ -68,10 +77,6 @@ const cancelAppointment = async (req, res) => {
   
   // 📌 Paciente ve sus turnos
   const getPatientAppointments = async (req, res) => {
-    console.log("\n🔍 Debug getPatientAppointments:");
-    console.log("Session:", req.session);
-    console.log("User in session:", req.session.user);
-
     try {
       if (!req.session.user) {
           console.log("❌ No hay usuario en sesión");
@@ -79,7 +84,7 @@ const cancelAppointment = async (req, res) => {
       }
 
       const appointments = await Appointment.find({ patient: req.session.user.id });
-      console.log("✅ Appointments encontrados:", appointments);
+      /* console.log("✅ Appointments encontrados:", appointments); */
       
       return res.json(appointments);
   } catch (error) {
@@ -91,9 +96,10 @@ const cancelAppointment = async (req, res) => {
   // 📌 Profesional ve todos los turnos de todos los pacientes
   const getAllAppointments = async (req, res) => {
     try {
-      const appointments = await Appointment.find().populate("patient", "username email");
+      const appointments = await Appointment.find().populate("patient", "name email");
       res.status(200).json(appointments);
     } catch (error) {
+      console.error("🔴 Error en getAllAppointments:", error);
       res.status(500).json({ message: "Error al obtener turnos" });
     }
   };

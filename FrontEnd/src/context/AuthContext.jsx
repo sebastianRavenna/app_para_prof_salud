@@ -13,6 +13,7 @@ const AuthProvider = ({ children }) => {
         const res = await axios.get("http://localhost:3000/api/users/session", { withCredentials: true });
         setUser(res.data);
         setIsAuthenticated(true);
+        console.log("Usuario autenticado:", res.data);
       } catch (error) {
         if (error.response?.status !== 401) {
           console.error("Error al verificar usuario:", error);
@@ -31,6 +32,7 @@ const AuthProvider = ({ children }) => {
     const res = await axios.post("http://localhost:3000/api/users/login", { email, password }, { withCredentials: true });
     setUser(res.data);
     setIsAuthenticated(true); 
+    console.log("Login exitoso, usuario:", res.data);
   };
 
   const logout = async () => {
@@ -40,7 +42,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, userId: user?.id }}>
       {children}
     </AuthContext.Provider>
   );

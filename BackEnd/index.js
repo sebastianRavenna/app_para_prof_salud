@@ -7,6 +7,7 @@ import { userRoutes } from './routes/userRoutes.js';
 import { appointmentRoutes } from './routes/appointmentRoutes.js';
 import { articleRoutes } from './routes/articleRoutes.js';
 import { sendReminders } from './controllers/appointmentController.js'
+import { clinicalHistoryRouter } from './routes/clinicalHistoryRoutes.js';
 process.loadEnvFile();
 
 
@@ -69,6 +70,7 @@ setInterval(() => {
 app.use('/api/users', userRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/articles", articleRoutes);
+app.use("/api/clinical-history", clinicalHistoryRouter);
 
 
 
