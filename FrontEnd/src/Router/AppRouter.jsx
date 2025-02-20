@@ -3,7 +3,6 @@ import { AuthProvider } from "../context/AuthContext";
 import { Login } from "../pages/Login"; 
 import { Home } from "../pages/Home";
 import { NotFound } from "../pages/NotFound";
-import { Dashboard } from "../pages/Dashboard";
 import { Register } from "../pages/Register";
 import { Appointments } from "../pages/Appointment";
 import { AdminPanel } from "../pages/AdminPanel";
@@ -18,7 +17,7 @@ const AppRouter = () => {
                     <Route path="/Register" element={<Register />} />
 
                     {/* 🔒 Protegemos rutas */}
-                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    
                     <Route path="/appointments" element={<ProtectedRoute role="patient"><Appointments /></ProtectedRoute>} />
                     <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} />
                           

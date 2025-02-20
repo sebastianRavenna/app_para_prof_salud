@@ -25,7 +25,8 @@ const AppointmentForm = () => {
       setMessage("✅ Turno solicitado correctamente.");
       setDate("");
       setReason("");
-      navigate("/dashboard")
+      window.location.reload("/Dashboard");
+      window.location.reload("/admin" );
     } catch (error) {
       setMessage("❌ Error al solicitar el turno.");
     }

@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
  
-
-
 const Layout = ({ children }) => { 
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
@@ -19,10 +17,18 @@ const Layout = ({ children }) => {
           <div className="navbar-menu"> 
             <div className="navbar-start"> 
               <Link to="/" className="navbar-item"> Home </Link> 
+           <div className="navbar-end"> 
+            {user?.role === "admin" ? (
+              <>
+              <Link to="/admin" className="navbar-item"> Panel Admin </Link> 
+            </>
+            ) : ( 
+              <Link to="/appointments" className="navbar-item">  Appointments </Link> 
+            )}
+            </div> 
             <div className="navbar-end"> 
             {user ? (
               <>
-              <Link to="/appointments" className="navbar-item"> Appointments </Link> 
               <button className="button is-light" onClick={ () => logout(navigate)}>
                     Logout
               </button>   

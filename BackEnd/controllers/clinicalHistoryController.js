@@ -32,7 +32,62 @@ const addNote = async (req, res) => {
   }
 };
 
+const editNote = async (req, res) => {
+  const { noteId } = req.params;
+  const { note } = req.body;
+  console.log("📝 editando nota desde el backend", { user: req.params.id, noteId, note})
+
+  try {
+    const history = await ClinicalHistory.findOne({  user: req.params.id });
+
+    if (!history) {
+      return res.status(404).json({ message: "Historia clínica no encontrada" });
+    }
+
+    const noteIndex = history.notes.findIndex(n => n._id.toString() === noteId);
+    if (noteIndex === -1) {
+      return res.status(404).json({ message: "Nota no encontrada" });
+    }
+
+    history.notes[noteIndex].note = note;
+    await history.save();
+
+    res.status(200).json({ message: "Nota actualizada correctamente", updatedNote: history.notes[noteIndex] });
+  } catch (error) {
+    console.error("❌ Error al editar la nota:", error);
+    res.status(500).json({ message: "Error al editar la nota" });
+  }
+};
+
+const removeNote = async (req, res) => {
+  const { noteId } = req.params;
+  const { userId } = req.params.id
+  
+  try {
+    const history = await ClinicalHistory.findOne({ user: req.params.id });
+
+    if (!history) {
+      return res.status(404).json({ message: "Historia clínica no encontrada" });
+    }
+
+    const noteIndex = history.notes.findIndex(n => n._id.toString() === noteId);
+    if (noteIndex === -1) {
+      return res.status(404).json({ message: "Nota no encontrada" });
+    }
+
+    history.notes.splice(noteIndex, 1);
+    await history.save();
+
+    res.status(200).json({ message: "Nota eliminada correctamente" });
+  } catch (error) {
+    console.error("❌ Error al eliminar la nota:", error);
+    res.status(500).json({ message: "Error al eliminar la nota" });
+  }
+};
+
 export {
     getClinicalHistory,
-    addNote
+    addNote,
+    editNote,
+    removeNote
 }

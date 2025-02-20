@@ -107,12 +107,10 @@ const cancelAppointment = async (req, res) => {
   // 📌 Profesional ve los turnos de un paciente
   const getAppointmentsByPatient = async (req, res) => {
     try {
-      const { id } = req.params;
-      const appointments = await Appointment.find({ patient: id });
-  
+      const appointments = await Appointment.find({ patient: req.params.id });
       res.status(200).json(appointments);
     } catch (error) {
-      res.status(500).json({ message: "Error al obtener turnos del paciente" });
+      res.status(500).json({ message: "Error en el servidor al obtener turnos del paciente" });
     }
   };
 
@@ -121,9 +119,13 @@ const scheduleAppointment = async (req, res) => {
     try {
       const { patientId, date, reason } = req.body;
   
-      const newAppointment = new Appointment({ patient: patientId, date, reason });
+      const newAppointment = new Appointment({ 
+        patient: patientId, 
+        date, 
+        reason 
+      });
+
       await newAppointment.save();
-  
       res.status(201).json({ message: "Turno agendado por el profesional", appointment: newAppointment });
     } catch (error) {
       res.status(500).json({ message: "Error al agendar turno" });

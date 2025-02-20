@@ -13,7 +13,6 @@ const AuthProvider = ({ children }) => {
         const res = await axios.get("http://localhost:3000/api/users/session", { withCredentials: true });
         setUser(res.data);
         setIsAuthenticated(true);
-        console.log("Usuario autenticado:", res.data);
       } catch (error) {
         if (error.response?.status !== 401) {
           console.error("Error al verificar usuario:", error);
