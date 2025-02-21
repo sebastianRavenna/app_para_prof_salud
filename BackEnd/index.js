@@ -30,7 +30,7 @@ app.use(
       maxAge: 86400000,
       domain: 'localhost',
       path: '/'
-    }, // Expira en 24 horas
+    }, 
   })
 );
 
@@ -44,24 +44,7 @@ app.use(
   );
 
   app.use(express.json());
-
-/* if (process.env.NODE_ENV !== 'production') {
-  app.use((req, res, next) => {
-      console.log("🟢 Session:", req.session);
-      console.log("🟢 User:", req.session.user);
-      next();
-  });
-} */
-
-  app.use((req, res, next) => {
-    console.log("\n🔍 Request recibido:", {
-        method: req.method,
-        path: req.path,
-        session: req.session,
-        cookies: req.cookies
-    });
-    next();
-});
+  app.use((req, res, next) => { next() });
 
 setInterval(() => {
     sendReminders();

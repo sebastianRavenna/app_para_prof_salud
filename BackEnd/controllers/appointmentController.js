@@ -7,9 +7,7 @@ import { ClinicalHistory } from '../models/clinicalHistoryModel.js';
 // 📌 1️⃣ Paciente solicita un turno
 const requestAppointment = async (req, res) => {
     try {
-/*       console.log("Sesión actual:", req.session);
-      console.log("Body recibido:", req.body);
- */      if (!req.session.user) {
+      if (!req.session.user) {
         return res.status(401).json({ message: "No autorizado. Falta autenticación." });
       }
       
@@ -79,7 +77,6 @@ const cancelAppointment = async (req, res) => {
   const getPatientAppointments = async (req, res) => {
     try {
       if (!req.session.user) {
-          console.log("❌ No hay usuario en sesión");
           return res.status(401).json({ message: "No autorizado" });
       }
 
@@ -117,15 +114,21 @@ const cancelAppointment = async (req, res) => {
 // 📌 6️⃣ Profesional agenda un turno manualmente
 const scheduleAppointment = async (req, res) => {
     try {
-      const { patientId, date, reason } = req.body;
+      const { patientId, date, reason, status } = req.body;
   
       const newAppointment = new Appointment({ 
         patient: patientId, 
         date, 
-        reason 
+        reason,
+        status
       });
 
       await newAppointment.save();
+
+      /* // Enviamos un correo de confirmación al paciente y al profesional
+      sendConfirmationEmail(patient, newAppointment);
+      sendConfirmationEmail(professional, newAppointment);
+       */
       res.status(201).json({ message: "Turno agendado por el profesional", appointment: newAppointment });
     } catch (error) {
       res.status(500).json({ message: "Error al agendar turno" });

@@ -35,7 +35,6 @@ const addNote = async (req, res) => {
 const editNote = async (req, res) => {
   const { noteId } = req.params;
   const { note } = req.body;
-  console.log("📝 editando nota desde el backend", { user: req.params.id, noteId, note})
 
   try {
     const history = await ClinicalHistory.findOne({  user: req.params.id });

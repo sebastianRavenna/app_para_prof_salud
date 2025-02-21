@@ -42,6 +42,17 @@ const cancelAppointment = async (appointmentId) => {
     }
 };
 
+// 📌 Profesional agenda un turno manualmente
+const scheduleAppointment = async (patientId, date, reason) => {
+    try {
+        const res = await api.post("/appointments/schedule", { patientId, date, reason });
+        return res.data;
+    } catch (error) {
+        console.error("❌ Error al agendar turno:", error.response?.data || error);
+        throw error;
+    }
+};
+
 // Profesional (admin) ve todos los turnos
 const getAllAppointments = async () => {
     try {
@@ -67,7 +78,6 @@ const getAppointmentsByPatient = async (userId) => {
 // Profesional (admin) cambia estado de un turno
 const updateAppointmentStatus = async (appointmentId, status) => {
     try {
-        console.log("🔥 Cambiando estado del turno:", { appointmentId, status });
         const res = await api.put(`/appointments/${appointmentId}/status`, { status });
         return res.data;
     } catch (error) {
@@ -109,6 +119,7 @@ const addNote = async (userId, note, file) => {
     }
 };
 
+// Profesional (admin) elimina una nota de la hist clinica
 const removeNote = async (userId, noteId) => {
     try {
         const res = await api.delete(`/clinical-history/${userId}/note/${noteId}`);
@@ -131,9 +142,9 @@ const editNote = async (userId, noteId, note) => {
 };
 
         // 📌 Crear nuevo usuario (Admin)
-const createUser = async (name, email, password, role) => {
+const createPatient = async (name, email, password, role) => {
     try {
-        const res = await api.post("/users", { name, email, password, role });
+        const res = await api.post("/users/register", { name, email, password, role });
         return res.data;
     } catch (error) {
         console.error("❌ Error al crear usuario:", error.response?.data || error);
@@ -142,7 +153,7 @@ const createUser = async (name, email, password, role) => {
 };
 
 // 📌 Ver todos los usuarios (Admin)
-const getAllUsers = async () => {
+const getAllPatients = async () => {
     try {
         const res = await api.get("/users");
         return res.data;
@@ -152,13 +163,14 @@ const getAllUsers = async () => {
     }
 };
 
-// 📌 Modificar permisos de usuario (Admin)
-const updateUserRole = async (userId, role) => {
+// 📌 Modificar usuario (Admin)
+const updateUser = async (userId, userData) => {
     try {
-        const res = await api.put(`/users/${userId}/role`, { role });
+        const res = await api.put(`/users/${userId}`, userData);
+        console.log(userId);
         return res.data;
     } catch (error) {
-        console.error("❌ Error al actualizar permisos:", error.response?.data || error);
+        console.error("❌ Error al actualizar usuario:", error.response?.data || error);
         throw error;
     }
 };
@@ -192,6 +204,7 @@ const getEmailSettings = async () => {
         requestAppointment, 
         getPatientAppointments, 
         cancelAppointment,
+        scheduleAppointment,
         getAllAppointments, 
         getAppointmentsByPatient,
         updateAppointmentStatus,
@@ -199,9 +212,9 @@ const getEmailSettings = async () => {
         addNote, 
         removeNote,
         editNote,
-        createUser,
-        getAllUsers,
-        updateUserRole,
+        createPatient,
+        getAllPatients,
+        updateUser,
         saveEmailSettings,
         getEmailSettings
     };

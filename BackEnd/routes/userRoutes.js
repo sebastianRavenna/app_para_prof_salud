@@ -6,7 +6,8 @@ import {
     getUserSession, 
     updateUser, 
     getUserById, 
-    updateEmailConfig  
+    updateEmailConfig,  
+    getAllPatients
 } from "../controllers/userController.js";
 
 import { authMiddleware } from "../middlewares/authMiddleware.js";
@@ -20,6 +21,7 @@ userRoutes.post("/logout", authMiddleware, logOutUser);
 userRoutes.get("/session", getUserSession);
 userRoutes.put("/:id", authMiddleware, updateUser); 
 userRoutes.get("/:id", authMiddleware, adminMiddleware, getUserById);
+userRoutes.get("/", authMiddleware, adminMiddleware, getAllPatients);
 userRoutes.put("/email-config", authMiddleware, updateEmailConfig);
 
 

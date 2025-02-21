@@ -50,15 +50,15 @@ const getUserSession = (req, res) => {
 
 const updateUser = async (req, res) => {
     const { name, email, password } = req.body;
-    const { id } = req.params;
+    const { id: userId } = req.params;
   
     try {
-      const user = await User.findById(id);
+      const user = await User.findById(userId);
       if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
   
-      if (req.session.user.id !== user._id.toString()) {
-        return res.status(403).json({ message: "No tienes permiso para modificar este usuario" });
-      }
+      if (req.session.user.id !== user._id.toString() && req.session.user.role !== "admin") {
+          return res.status(403).json({ message: "No tienes permiso para modificar este usuario" });
+        }
   
       if (name) user.name = name;
       if (email) user.email = email;
@@ -102,4 +102,23 @@ const updateEmailConfig = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logOutUser, getUserSession, updateUser, getUserById, updateEmailConfig };
+const getAllPatients = async (req, res) => {
+  try {
+      const patients = await User.find({ role: "patient" }).select("-password"); // Excluye la contraseña por seguridad
+      res.json(patients);
+  } catch (error) {
+      console.error("❌ Error al obtener pacientes:", error);
+      res.status(500).json({ error: "Error al obtener pacientes" });
+  }
+};
+
+export { 
+  registerUser, 
+  loginUser, 
+  logOutUser, 
+  getUserSession, 
+  updateUser, 
+  getUserById, 
+  updateEmailConfig,
+  getAllPatients
+};

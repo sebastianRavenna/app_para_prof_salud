@@ -22,6 +22,7 @@ const AdminPanel = () => {
   const [editedNote, setEditedNote] = useState(""); 
 
   useEffect(() => {
+    //fetch para obtener todos los turnos
     const fetchAppointments = async () => {
       try {
         const data = await getAllAppointments(); 
@@ -33,6 +34,7 @@ const AdminPanel = () => {
     fetchAppointments();
   }, []);
 
+  //fetch para obtener la historia clínica de un paciente
   const fetchHistory = async (patientId, patientName) => {
     if (!patientId) return console.error("❌ Error: patientId es undefined");
     try {
@@ -45,6 +47,7 @@ const AdminPanel = () => {
     }
   };
 
+  //funcion para AGREGAR notas a la historia clínica
   const handleAddNote = async () => {
     if (!note.trim()) return alert("La nota no puede estar vacía");
     try {
@@ -55,11 +58,10 @@ const AdminPanel = () => {
       console.error("❌ Error al agregar la nota:", error);
     }
   };
-
+  //funcion para EDITAR notas a la historia clínica
   const handleEditNote = async (noteId) => {
     try {
         await editNote(selectedPatient, noteId, editedNote);
-        console.log("editando desde el panel ",selectedPatient, noteId, editedNote);
         setHistory((prev) => ({
             ...prev,
             notes: prev.notes.map((note) =>
@@ -71,7 +73,7 @@ const AdminPanel = () => {
         console.error("❌ Error al editar nota:", error);
     }
 };
-  
+  //funcion para ELIMINAR notas de la historia clínica
   const deleteNote = async (noteId) => {
     console.log("📝 Eliminando nota:", { selectedPatient, noteId });
 
@@ -88,6 +90,7 @@ const AdminPanel = () => {
     }
   };
 
+  //funcion para CANCELAR turnos
   const handleCancel = async (id) => {
     if (!window.confirm("¿Seguro que quieres cancelar este turno?")) return;
     try {
@@ -98,10 +101,10 @@ const AdminPanel = () => {
     }
   };
 
+  //funcion para CAMBIAR estado de los turnos
   const handleStatusChange = async (appointmentId, newStatus) => {
     if (!window.confirm("¿Seguro que quieres cambiar el estado de este turno?")) return;
-  
-    try {
+      try {
       await updateAppointmentStatus(appointmentId, newStatus);
       setAppointments(prevAppointments =>
         prevAppointments.map(app =>
@@ -145,8 +148,8 @@ const AdminPanel = () => {
                 <td>{appointment.date ? new Date(appointment.date).toLocaleDateString() : "Fecha no disponible"}</td>
                 <td>{appointment.date ? new Date(appointment.date).toLocaleTimeString() : "Hora no disponible"}</td>
                 <td>
-                    <select className={` select is-small
-                    ${appointment.status === "Pendiente" ? "has-background-warning" :
+                    <select className={`select is-small
+                    ${appointment.status === "Pendiente" ? "has-background-warning-light" :
                     appointment.status === "Realizado" ? "has-background-success" :
                     appointment.status === "Ausente" ? "has-background-danger-light" : ""}`}
                       value={appointment.status}
@@ -192,6 +195,7 @@ const AdminPanel = () => {
               <ul>
                 {history.notes?.length > 0 ? (
                   history.notes?.map((note) => (
+                    
                     <li key={note._id} className="box">
                       <strong>{new Date(note.date).toLocaleDateString()}</strong>:{" "} 
                       {editingNoteId === note._id ? (
