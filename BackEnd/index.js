@@ -8,10 +8,13 @@ import { appointmentRoutes } from './routes/appointmentRoutes.js';
 import { articleRoutes } from './routes/articleRoutes.js';
 import { sendReminders } from './controllers/appointmentController.js'
 import { clinicalHistoryRouter } from './routes/clinicalHistoryRoutes.js';
-process.loadEnvFile();
+import dotenv from 'dotenv';
+dotenv.config();
+
+/* process.loadEnvFile(); */
 
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(
@@ -24,13 +27,13 @@ app.use(
     collectionName: "sessions",
     }),
     cookie: { 
-      secure: false, 
+      secure: process.env.NODE_ENV === "production",  
       httpOnly: true, 
       sameSite: "lax", 
       maxAge: 86400000,
-      domain: 'localhost',
+/*       domain: 'localhost',
       path: '/'
-    }, 
+ */    }, 
   })
 );
 
