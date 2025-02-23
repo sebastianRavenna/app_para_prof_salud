@@ -7,10 +7,12 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); //
   
+  const VITE_API_URL="https://consultorio-fullstack.vercel.app/"
+
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/users/session", { withCredentials: true });
+        const res = await axios.get(VITE_API_URL, "/api/users/session", { withCredentials: true });
         setUser(res.data);
         setIsAuthenticated(true);
       } catch (error) {
@@ -28,14 +30,14 @@ const AuthProvider = ({ children }) => {
   }, [isAuthenticated]); 
   
   const login = async (email, password) => {
-    const res = await axios.post("http://localhost:3000/api/users/login", { email, password }, { withCredentials: true });
+    const res = await axios.post(VITE_API_URL, "/api/users/login", { email, password }, { withCredentials: true });
     setUser(res.data);
     setIsAuthenticated(true); 
     console.log("Login exitoso, usuario:", res.data);
   };
 
   const logout = async () => {
-    await axios.post("http://localhost:3000/api/users/logout", {}, { withCredentials: true });
+    await axios.post(VITE_API_URL, "api/users/logout", {}, { withCredentials: true });
     setUser(null);
     setIsAuthenticated(false);
   };

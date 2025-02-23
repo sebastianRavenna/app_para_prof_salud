@@ -1,6 +1,6 @@
 import axios from "axios";
     
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://consultorio-fullstack.vercel.app/api";
 
 const api = axios.create({
     baseURL: API_URL,
@@ -9,6 +9,7 @@ const api = axios.create({
         'Content-Type': 'application/json'
     }
 });
+
 
     // 📌 Paciente solicita un turno
 const requestAppointment = async (date, reason) => {
