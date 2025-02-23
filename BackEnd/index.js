@@ -29,7 +29,7 @@ app.use(
     cookie: { 
       secure: process.env.NODE_ENV === "production",  
       httpOnly: true, 
-      sameSite: "lax", 
+      sameSite: "none", 
       maxAge: 86400000,
 /*       domain: 'localhost',
       path: '/'
@@ -40,7 +40,7 @@ app.use(
 app.use(
     cors({
       origin: [
-        "http://localhost:5173", // Solo permite tu frontend
+        /* "http://localhost:5173", // Solo permite tu frontend */
         "https://consultorio-fullstack-shw3-h08wpslgv.vercel.app"
     ],
       credentials: true, // Permite enviar cookies y headers de autenticación
