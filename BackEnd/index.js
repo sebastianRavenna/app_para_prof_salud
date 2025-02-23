@@ -13,7 +13,7 @@ dotenv.config();
 
 /* process.loadEnvFile(); */
 
-
+const API_URL = "https://consultorio-fullstack.vercel.app/api/";
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -41,6 +41,7 @@ app.use(
     cors({
       origin: [
         /* "http://localhost:5173", // Solo permite tu frontend */
+        "https://consultorio-fullstack.vercel.app",
         "https://consultorio-fullstack-shw3-h08wpslgv.vercel.app"
     ],
       credentials: true, // Permite enviar cookies y headers de autenticación
