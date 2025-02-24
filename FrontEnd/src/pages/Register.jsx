@@ -15,7 +15,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:3000/api/users/register", userData);
+      await axios.post("https://consultorio-fullstack.vercel.app/api/users/register", userData);
+        /* "http://localhost:3000/api/users/register", userData); */
       navigate("/login");
     } catch (err) {
       setError(err.response.data.msg || "Error en el registro");
