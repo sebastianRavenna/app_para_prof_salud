@@ -13,7 +13,7 @@ dotenv.config();
 
 /* process.loadEnvFile(); */
 
-const API_URL = "https://consultorio-fullstack.vercel.app/api/";
+const API_URL = "https://consultorio-fullstack.vercel.app/";
 const PORT = process.env.PORT || 3000;
 const app = express();
 
