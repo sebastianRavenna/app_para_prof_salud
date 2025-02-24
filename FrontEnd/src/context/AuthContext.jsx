@@ -7,7 +7,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); //
   
-  const VITE_API_URL="https://consultorio-fullstack.vercel.app/"
+  const VITE_API_URL="https://consultorio-fullstack-shw3.vercel.app/"
 
   useEffect(() => {
     const checkUser = async () => {
