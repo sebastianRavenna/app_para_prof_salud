@@ -38,11 +38,11 @@ app.use(
 
 app.use(
     cors({
-      origin: [
-        /* "http://localhost:5173", // Solo permite tu frontend */
+      origin: "*" /* [
+        "http://localhost:5173", // Solo permite tu frontend 
         "https://consultorio-fullstack.vercel.app",
         "https://consultorio-fullstack-shw3.vercel.app/",  
-    ],
+    ] */,
       credentials: true, // Permite enviar cookies y headers de autenticación
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
