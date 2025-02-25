@@ -63,7 +63,24 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/clinical-history", clinicalHistoryRouter);
 
+app.get("/", (req, res) => {
+  res.send("Hola mundo");
+});
 
+app.get("/test-db", async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).send("❌ MongoDB no está conectado.");
+    }
+
+    const result = await mongoose.connection.db.admin().ping();
+    console.log("Ping result:", result);
+    res.send("✅ Conectado a MongoDB!");
+  } catch (error) {
+    console.error("Error en /test-db:", error);
+    res.status(500).send("❌ No se pudo conectar a MongoDB");
+  }
+});
 
 app.listen(PORT, () => {
     console.log('Server is running');
