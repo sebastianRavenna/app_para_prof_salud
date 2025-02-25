@@ -69,16 +69,24 @@ app.get("/", (req, res) => {
 
 app.get("/test-db", async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(500).send("❌ MongoDB no está conectado.");
+    const mongoose = await import("mongoose");
+    
+    // Verificar si mongoose ya está conectado
+    // Si usas import dinámico, necesitas acceder a la conexión mediante .default
+    const mongooseInstance = mongoose.default || mongoose;
+    
+    if (!mongooseInstance.connection || mongooseInstance.connection.readyState !== 1) {
+      // Si no está conectado, intentar conectar
+      const URI_DB = process.env.URI_DB;
+      await mongooseInstance.connect(URI_DB);
     }
-
-    const result = await mongoose.connection.db.admin().ping();
-    console.log("Ping result:", result);
+    
+    // Verificar la conexión
+    await mongooseInstance.connection.db.command({ ping: 1 });
     res.send("✅ Conectado a MongoDB!");
   } catch (error) {
     console.error("Error en /test-db:", error);
-    res.status(500).send("❌ No se pudo conectar a MongoDB");
+    res.status(500).send(`❌ No se pudo conectar a MongoDB: ${error.message}`);
   }
 });
 
