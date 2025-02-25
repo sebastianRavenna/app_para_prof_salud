@@ -16,6 +16,8 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+connectDB();
+
 app.use(
   session({
     secret: "supersecreto", // Clave para cifrar la sesión
@@ -65,5 +67,4 @@ app.use("/api/clinical-history", clinicalHistoryRouter);
 
 app.listen(PORT, () => {
     console.log('Server is running');
-    connectDB();
 })
