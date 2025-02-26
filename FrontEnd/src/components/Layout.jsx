@@ -13,6 +13,7 @@ const Layout = ({ children }) => {
     return location.pathname === path ? "is-active has-text-weight-bold has-background-primary-35" : "";
   };
 
+  console.log(user?.role);
   return (
     <>
       <header>
@@ -36,11 +37,12 @@ const Layout = ({ children }) => {
               {user?.role === "admin" ? (
                 <>
                   <Link 
-                    to="/admin" 
+                    to="/admin/turnos" 
                     className={`navbar-item ${isActive("/admin/turnos")}`}
                   >
                     Turnos Pendientes
                   </Link>
+                  
                   <Link 
                     to="/admin/patients" 
                     className={`navbar-item ${isActive("/admin/patients")}`}

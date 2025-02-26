@@ -34,7 +34,6 @@ const AuthProvider = ({ children }) => {
       const res = await axios.post(`${API_URL}/api/users/login`, { email, password }, { withCredentials: true });
       setUser(res.data);
       setIsAuthenticated(true); 
-      console.log("Login exitoso, usuario:", res.data);
     } catch (error) {
       console.error("Error en login:", error.response?.data || error.message);
       throw error; // Esto permite manejar errores en el frontend (ej. mostrar alertas)

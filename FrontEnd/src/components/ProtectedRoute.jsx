@@ -7,20 +7,19 @@ const ProtectedRoute = ({ children, role }) => {
   const navigate = useNavigate(); 
 
   useEffect(() => {
+    
     if (user) {
-      if (user.role === "admin") {
+      if (user?.role === "admin") {
         navigate("/admin/turnos"); // Redirige a la página del Admin
       } else {
         navigate("/appointments"); // Redirige a los turnos si no es admin
       }
     }
   }, [user, navigate]);
-
+  
   if (loading) return <p>Cargando...</p>;  // Evita redirigir antes de saber el estado
-
+  
   if (!user) return <Navigate to="/" />;
-
-  /* if (role && user.role !== role) return <Navigate to="/appointments" />; */
 
   return children;
 };

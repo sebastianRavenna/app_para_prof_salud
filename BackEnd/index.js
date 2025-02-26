@@ -15,7 +15,9 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+const LOCAL_HOST = process.env.LOCAL_HOST
 
+console.log("LOCALHOST", LOCAL_HOST)
 connectDB();
 
 app.use(
@@ -28,7 +30,7 @@ app.use(
     collectionName: "sessions",
     }),
     cookie: { 
-      secure: false,  
+      secure: true,  
       httpOnly: true, 
       sameSite: "lax", 
       maxAge: 86400000,
@@ -40,7 +42,7 @@ app.use(
 
 app.use(
     cors({
-      origin: "http://localhost:5173" ,
+      origin: LOCAL_HOST,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true, // Permite enviar cookies y headers de autenticación */
