@@ -37,9 +37,9 @@ const Layout = ({ children }) => {
                 <>
                   <Link 
                     to="/admin" 
-                    className={`navbar-item ${isActive("/admin")}`}
+                    className={`navbar-item ${isActive("/admin/turnos")}`}
                   >
-                    Panel Admin
+                    Turnos Pendientes
                   </Link>
                   <Link 
                     to="/admin/patients" 

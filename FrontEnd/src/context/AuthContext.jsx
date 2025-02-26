@@ -1,18 +1,20 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
+
 const AuthContext = createContext();
+
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); //
   
-  const VITE_API_URL="https://consultorio-fullstack-shw3.vercel.app/"
-
+  const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
+  
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const res = await axios.get(VITE_API_URL, "/api/users/session", { withCredentials: true });
+        const res = await axios.get(`${API_URL}/api/users/session`, { withCredentials: true });
         setUser(res.data);
         setIsAuthenticated(true);
       } catch (error) {
@@ -25,22 +27,31 @@ const AuthProvider = ({ children }) => {
       setLoading(false);
     };
     checkUser();
-    
-    
-  }, [isAuthenticated]); 
+  }, [API_URL]); 
   
   const login = async (email, password) => {
-    const res = await axios.post(VITE_API_URL, "/api/users/login", { email, password }, { withCredentials: true });
-    setUser(res.data);
-    setIsAuthenticated(true); 
-    console.log("Login exitoso, usuario:", res.data);
+    try {
+      const res = await axios.post(`${API_URL}/api/users/login`, { email, password }, { withCredentials: true });
+      setUser(res.data);
+      setIsAuthenticated(true); 
+      console.log("Login exitoso, usuario:", res.data);
+    } catch (error) {
+      console.error("Error en login:", error.response?.data || error.message);
+      throw error; // Esto permite manejar errores en el frontend (ej. mostrar alertas)
+    }
   };
+  
 
   const logout = async () => {
-    await axios.post(VITE_API_URL, "api/users/logout", {}, { withCredentials: true });
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+    try {
+      await axios.post(`${API_URL}/api/users/logout`, {}, { withCredentials: true });
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error("Error en logout:", error.response?.data || error.message);
+      throw error;
+    }
+  };  
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, userId: user?.id }}>

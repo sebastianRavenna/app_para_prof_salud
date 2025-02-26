@@ -28,7 +28,7 @@ app.use(
     collectionName: "sessions",
     }),
     cookie: { 
-      secure: true,  
+      secure: false,  
       httpOnly: true, 
       sameSite: "lax", 
       maxAge: 86400000,
@@ -40,19 +40,19 @@ app.use(
 
 app.use(
     cors({
-      origin: "*" ,
+      origin: "http://localhost:5173" ,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true, // Permite enviar cookies y headers de autenticación
+      credentials: true, // Permite enviar cookies y headers de autenticación */
     })
   );
 
   app.use(express.json());
   /* app.use((req, res, next) => { next() }); */
 
-setInterval(() => {
+/* setInterval(() => {
     sendReminders();
-  }, 24 * 60 * 60 * 1000); // Ejecuta cada 24 horas
+  }, 24 * 60 * 60 * 1000);  */// Ejecuta cada 24 horas
 
 app.use('/api/users', userRoutes);
 app.use("/api/appointments", appointmentRoutes);

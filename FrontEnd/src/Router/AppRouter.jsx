@@ -18,9 +18,11 @@ const AppRouter = () => {
                     <Route path="/Register" element={<Register />} />
 
                     {/* 🔒 Protegemos rutas */}
-                    
+                    {/*Rutas de pacientes*/}
                     <Route path="/appointments" element={<ProtectedRoute role="patient"><Appointments /></ProtectedRoute>} />
-                    <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} />
+                    
+                    {/*Rutas del profesional*/}
+                    <Route path="/admin/turnos" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} />
                     <Route path="/admin/patients" element={<ProtectedRoute role="admin"><AdminPatient /></ProtectedRoute>} />
                           
                     <Route path="*" element={<NotFound />} />
