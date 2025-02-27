@@ -1,14 +1,14 @@
 import express from 'express';
 import cors from 'cors';
-import { connectDB } from './config/connectDB.js'
 import session from 'express-session';
+import dotenv from 'dotenv';
 import MongoStore from 'connect-mongo';
+import { connectDB } from './config/connectDB.js'
 import { userRoutes } from './routes/userRoutes.js';
 import { appointmentRoutes } from './routes/appointmentRoutes.js';
 import { articleRoutes } from './routes/articleRoutes.js';
 import { sendReminders } from './controllers/appointmentController.js'
 import { clinicalHistoryRouter } from './routes/clinicalHistoryRoutes.js';
-import dotenv from 'dotenv';
 dotenv.config();
 
 /* process.loadEnvFile(); */
@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 const LOCAL_HOST = process.env.LOCAL_HOST
 
-console.log("LOCALHOST", LOCAL_HOST)
 connectDB();
 
 app.use(
@@ -30,11 +29,14 @@ app.use(
     collectionName: "sessions",
     }),
     cookie: { 
-      secure: true,  
+      secure: process.env.NODE_ENV === "production", // Solo se envía por HTTPS  
       httpOnly: true, 
-      sameSite: "none", 
-      maxAge: 86400000,
-/*       domain: 'localhost',
+      sameSite: `if (process.env.NODE_ENV === "production"){
+        "none"
+      } else 
+      "lax"`, 
+/*      maxAge: 86400000,
+       domain: 'localhost',
       path: '/'
  */    }, 
   })
