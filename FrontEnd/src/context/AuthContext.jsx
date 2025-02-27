@@ -1,7 +1,5 @@
-import { createContext, useState, useEffect, use } from "react";
+import { createContext, useState, useEffect } from "react";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
-
 
 const AuthContext = createContext();
 
@@ -15,8 +13,11 @@ const AuthProvider = ({ children }) => {
   
   useEffect(() => {
     const checkUser = async () => {
+      console.log("🔵 Comprobando sesión en el frontend...");
       try {
-        const res = await axios.get(`${API_URL}/api/users/session`, { withCredentials: true });
+        const res = await axios.get(`${API_URL}/api/users/session`, 
+          { withCredentials: true });
+        console.log("✅ Sesión encontrada en el frontend:", res.data);
         setUser(res.data);
         setIsAuthenticated(true);
       } catch (error) {
@@ -32,19 +33,24 @@ const AuthProvider = ({ children }) => {
   }, [API_URL]); 
   
   const login = async (email, password) => {
+    console.log("🔵 Enviando login con:", email, password);
     try {
-      const res = await axios.post(`${API_URL}/api/users/login`, { email, password }, { withCredentials: true, });
+      const res = await axios.post(`${API_URL}/api/users/login`, 
+        { email, password }, 
+        { withCredentials: true, }
+      );
+      console.log("✅ Login exitoso, respuesta del backend:", res.data);
       setUser(res.data);
       setIsAuthenticated(true); 
       return res.data;
     } catch (error) {
       console.error("Error en login:", error.response?.data || error.message);
-      throw error; // Esto permite manejar errores en el frontend (ej. mostrar alertas)
+      throw error; 
     }
   };
   
 
-  const logout = async () => {
+    const logout = async () => {
     try {
       await axios.post(`${API_URL}/api/users/logout`, {}, { withCredentials: true });
       setUser(null);

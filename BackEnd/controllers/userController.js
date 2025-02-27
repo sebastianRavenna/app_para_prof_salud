@@ -19,7 +19,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log("🔵 Login recibido con:", email, password);
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Usuario no encontrado" });
@@ -44,8 +44,13 @@ const logOutUser = (req, res) => {
 };
 
 const getUserSession = (req, res) => {
-    if (!req.session.user) return res.status(401).json({ message: "No autenticado" });
-    res.status(200).json(req.session.user);
+  console.log("🔵 Verificando sesión...");
+  console.log("🟡 Sesión actual:", req.session);
+    if (!req.session.user) {
+      console.log("✅ Usuario autenticado:", req.session.user);return res.status(401).json({ message: "No autenticado" });
+    } else {
+        console.log("❌ No hay sesión activa");
+        res.status(200).json(req.session.user);}
 };
 
 const updateUser = async (req, res) => {
