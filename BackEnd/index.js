@@ -32,7 +32,7 @@ app.use(
     cookie: { 
       secure: true,  
       httpOnly: true, 
-      sameSite: "lax", 
+      sameSite: "none", 
       maxAge: 86400000,
 /*       domain: 'localhost',
       path: '/'
