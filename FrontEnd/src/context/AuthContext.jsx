@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 
 const AuthContext = createContext();
@@ -9,6 +10,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); //
   
+
   const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
   
   useEffect(() => {
@@ -34,6 +36,7 @@ const AuthProvider = ({ children }) => {
       const res = await axios.post(`${API_URL}/api/users/login`, { email, password }, { withCredentials: true, });
       setUser(res.data);
       setIsAuthenticated(true); 
+      Navigate("/"); // Redirige al home
     } catch (error) {
       console.error("Error en login:", error.response?.data || error.message);
       throw error; // Esto permite manejar errores en el frontend (ej. mostrar alertas)
@@ -46,6 +49,7 @@ const AuthProvider = ({ children }) => {
       await axios.post(`${API_URL}/api/users/logout`, {}, { withCredentials: true });
       setUser(null);
       setIsAuthenticated(false);
+      Navigate("/"); // Redirige al home
     } catch (error) {
       console.error("Error en logout:", error.response?.data || error.message);
       throw error;

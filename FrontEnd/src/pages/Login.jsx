@@ -10,26 +10,31 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate(); 
 
-  useEffect(() => {
-    if (user) {
-      if (user.role === "admin") {
-        navigate("/admin"); // Redirige a la página del Admin
-      } else {
-        navigate("/appointments"); // Redirige a los turnos si no es admin
-      }
-    }
-  }, [user, navigate]);
+  
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await login(email, password, navigate);
+      window.location.reload();
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setMessage("❌ Error en el usuario y/o la contraseña.");
     }
+    
   };
+  
+  useEffect(() => {
+    if (user) {
+      if (user.role === "admin") {
+        navigate("/admin/turnos"); // Redirige a la página del Admin
+      } else {
+        navigate("/appointments"); // Redirige a los turnos si no es admin
+      }
+    }
+  }, [user, navigate]);
+  
 
   /* const testConnection = async () => {
     try {

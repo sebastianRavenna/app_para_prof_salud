@@ -31,10 +31,7 @@ app.use(
     cookie: { 
       secure: process.env.NODE_ENV === "production", // Solo se envía por HTTPS  
       httpOnly: true, 
-      sameSite: `if (process.env.NODE_ENV === "production"){
-        "none"
-      } else 
-      "lax"`, 
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
 /*      maxAge: 86400000,
        domain: 'localhost',
       path: '/'
