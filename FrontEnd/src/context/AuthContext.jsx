@@ -42,7 +42,7 @@ const AuthProvider = ({ children }) => {
       console.log("✅ Login exitoso, respuesta del backend:", res.data);
       setUser(res.data);
       setIsAuthenticated(true); 
-      return res.data;
+      /* return res.data; */
     } catch (error) {
       console.error("Error en login:", error.response?.data || error.message);
       throw error; 
