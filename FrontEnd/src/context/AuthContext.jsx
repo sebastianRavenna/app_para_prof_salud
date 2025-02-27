@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
   
   const login = async (email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/api/users/login`, { email, password }, { withCredentials: true });
+      const res = await axios.post(`${API_URL}/api/users/login`, { email, password }, { withCredentials: true, });
       setUser(res.data);
       setIsAuthenticated(true); 
     } catch (error) {
