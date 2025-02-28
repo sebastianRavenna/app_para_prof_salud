@@ -7,7 +7,6 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); //
-  
 
   const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
   
@@ -20,6 +19,7 @@ const AuthProvider = ({ children }) => {
         console.log("✅ Sesión encontrada en el frontend:", res.data);
         setUser(res.data);
         setIsAuthenticated(true);
+        
       } catch (error) {
         if (error.response?.status !== 401) {
           console.error("Error al verificar usuario:", error);

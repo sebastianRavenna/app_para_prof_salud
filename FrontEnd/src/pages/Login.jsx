@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(email, password, navigate);
-      window.location.reload();
+     /*  window.location.reload(); */
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setMessage("❌ Error en el usuario y/o la contraseña.");

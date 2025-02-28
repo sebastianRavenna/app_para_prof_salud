@@ -6,16 +6,16 @@ const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate(); 
 
-  /*useEffect(() => {
+  useEffect(() => {
     
-     if (user) {
+    if (user) {
       if (user?.role === "admin") {
         navigate("/admin/turnos"); // Redirige a la página del Admin
       } else {
         navigate("/appointments"); // Redirige a los turnos si no es admin
       }
     }
-  }, [user, navigate]); */
+  }, [user, navigate]);
   
   if (loading) return <p>Cargando...</p>;  // Evita redirigir antes de saber el estado
   
