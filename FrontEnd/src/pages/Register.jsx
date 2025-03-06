@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Layout } from "../components/Layout"
+import { createPatient } from "../services/api";
 
 const Register = () => {
   const [userData, setUserData] = useState({ name: "", email: "", password: "", role: "patient" });
@@ -15,8 +16,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://consultorio-fullstack.vercel.app/api/users/register", userData);
-        /* "http://localhost:3000/api/users/register", userData); */
+      await createPatient (userData.name, userData.email, userData.password, userData.role);
+      /*("https://consultorio-fullstack.vercel.app/api/users/register", userData); */
       navigate("/login");
     } catch (err) {
       setError(err.response.data.msg || "Error en el registro");

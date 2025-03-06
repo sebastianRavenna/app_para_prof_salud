@@ -12,7 +12,7 @@ import {
 import { Layout } from "../components/Layout";
 
 const AdminPanel = () => {
-  const { user, loading } = useContext(AuthContext); 
+  const { user, loading, token } = useContext(AuthContext); 
   const [appointments, setAppointments] = useState([]);
   const [history, setHistory] = useState({});
   const [note, setNote] = useState("");
@@ -25,14 +25,16 @@ const AdminPanel = () => {
     //fetch para obtener todos los turnos
     const fetchAppointments = async () => {
       try {
-        const data = await getAllAppointments(); 
+        if (!token) return console.error("❌ No hay token disponible");
+        
+        const data = await getAllAppointments(token); 
         setAppointments(data);
       } catch (error) {
         console.error("❌ Error al obtener turnos:", error);
       }
     };
     fetchAppointments();
-  }, []);
+  }, [user, token]);
 
   //fetch para obtener la historia clínica de un paciente
   const fetchHistory = async (patientId, patientName) => {
@@ -40,7 +42,11 @@ const AdminPanel = () => {
     try {
       setSelectedPatient(patientId);
       setSelectedPatientName(patientName);
-      const data = await getClinicalHistory(patientId);
+
+       // Obtener token
+      if (!token) return console.error("❌ No hay token disponible");
+
+      const data = await getClinicalHistory(patientId, token);
       setHistory(data);
     } catch (error) {
       console.error("❌ Error al obtener la historia clínica:", error);
@@ -51,17 +57,23 @@ const AdminPanel = () => {
   const handleAddNote = async () => {
     if (!note.trim()) return alert("La nota no puede estar vacía");
     try {
-      await addNote(selectedPatient, note);
+      
+      if (!token) return console.error("❌ No hay token disponible");
+
+      await addNote(selectedPatient, note, token);
       setHistory(prev => ({ ...prev, notes: [...prev.notes, { date: new Date(), note }] }));
       setNote("");
     } catch (error) {
       console.error("❌ Error al agregar la nota:", error);
     }
   };
+
   //funcion para EDITAR notas a la historia clínica
   const handleEditNote = async (noteId) => {
     try {
-        await editNote(selectedPatient, noteId, editedNote);
+      
+      if (!token) return console.error("❌ No hay token disponible");
+        await editNote(selectedPatient, noteId, editedNote, token);
         setHistory((prev) => ({
             ...prev,
             notes: prev.notes.map((note) =>
@@ -75,12 +87,14 @@ const AdminPanel = () => {
 };
   //funcion para ELIMINAR notas de la historia clínica
   const deleteNote = async (noteId) => {
-    console.log("📝 Eliminando nota:", { selectedPatient, noteId });
-
+    
     if (!window.confirm("¿Seguro que quieres eliminar esta nota?")) return;
   
     try {
-      await removeNote(selectedPatient, noteId);
+      
+      if (!token) return console.error("❌ No hay token disponible");
+
+      await removeNote(selectedPatient, noteId, token);
       setHistory((prev) => ({
         ...prev,
         notes: prev.notes.filter((note) => note._id !== noteId),
@@ -92,9 +106,14 @@ const AdminPanel = () => {
 
   //funcion para CANCELAR turnos
   const handleCancel = async (id) => {
+    console.log("Usuario en contexto:", user);
+    console.log("token en contexto:", token);
     if (!window.confirm("¿Seguro que quieres cancelar este turno?")) return;
     try {
-      await cancelAppointment(id);
+      
+      if (!token) return console.error("❌ No hay token disponible");
+
+      await cancelAppointment(id, token);
       setAppointments(appointments.filter(app => app._id !== id));
     } catch (error) {
       console.error("❌ Error al cancelar turno:", error);
@@ -105,7 +124,10 @@ const AdminPanel = () => {
   const handleStatusChange = async (appointmentId, newStatus) => {
     if (!window.confirm("¿Seguro que quieres cambiar el estado de este turno?")) return;
       try {
-      await updateAppointmentStatus(appointmentId, newStatus);
+      
+      if (!token) return console.error("❌ No hay token disponible");
+
+      await updateAppointmentStatus(appointmentId, newStatus, token);
       setAppointments(prevAppointments =>
         prevAppointments.map(app =>
           app._id === appointmentId ? { ...app, status: newStatus } : app

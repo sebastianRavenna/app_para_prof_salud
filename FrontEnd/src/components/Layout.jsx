@@ -13,7 +13,6 @@ const Layout = ({ children }) => {
     return location.pathname === path ? "is-active has-text-weight-bold has-background-primary-35" : "";
   };
 
-  console.log(user?.role);
   return (
     <>
       <header>
@@ -24,7 +23,7 @@ const Layout = ({ children }) => {
         >
           <div className="navbar-brand">
             <Link to="/" className= "navbar-item" >
-              <strong>MiApp</strong>
+              <img src="/assets/logo.png" alt="" />
             </Link>
           </div>
 

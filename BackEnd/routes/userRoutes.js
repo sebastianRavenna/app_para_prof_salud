@@ -6,6 +6,7 @@ import {
     getUserSession, 
     updateUser, 
     getUserById, 
+    getUserProfile,
     updateEmailConfig,  
     getAllPatients
 } from "../controllers/userController.js";
@@ -17,8 +18,9 @@ const userRoutes = Router();
 
 userRoutes.post("/register", registerUser);
 userRoutes.post("/login", loginUser);
-userRoutes.post("/logout", authMiddleware, logOutUser);
-userRoutes.get("/session", getUserSession);
+userRoutes.post("/logout", logOutUser);
+userRoutes.get("/profile", authMiddleware, getUserProfile);
+userRoutes.get("/session", authMiddleware, getUserSession);
 userRoutes.put("/:id", authMiddleware, updateUser); 
 userRoutes.get("/:id", authMiddleware, adminMiddleware, getUserById);
 userRoutes.get("/", authMiddleware, adminMiddleware, getAllPatients);

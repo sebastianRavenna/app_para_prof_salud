@@ -2,17 +2,23 @@ import axios from "axios";
     
 const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
 
-
 const api = axios.create({
     baseURL: `${API_URL}/api`,
-    withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
     }
 });
-
-
-    // 📌 Paciente solicita un turno
+//chequear sin Bearer
+// 📌 Middleware para incluir el token automáticamente
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+  
+// 📌 Paciente solicita un turno
 const requestAppointment = async (date, reason) => {
     try {
         const res = await api.post("/appointments", { date, reason });
@@ -37,7 +43,8 @@ const getPatientAppointments = async () => {
     // Cancelacion de turno (paciente y profesional)
 const cancelAppointment = async (appointmentId) => {
     try {
-        await api.delete(`/appointments/${appointmentId}`);
+        const res = await api.delete(`/appointments/${appointmentId}`);
+        return res.data;
     } catch (error) {
         console.error("❌ Error al cancelar turno:", error.response?.data || error);
         throw error;
@@ -90,8 +97,12 @@ const updateAppointmentStatus = async (appointmentId, status) => {
 
 // Profesional (admin) ve la hist clinica
 const getClinicalHistory = async (userId) => {
+    console.log("llamando a la api para historias")
+    console.log("UserId:", userId)
+    
     try {
         const res = await api.get(`/clinical-history/${userId}`);
+        console.log(res)
         return res.data;
     } catch (error) {
         console.error("❌ Error al obtener historia clínica:", error.response?.data || error);
@@ -105,8 +116,6 @@ const addNote = async (userId, note, file) => {
         const formData = new FormData();
         if (note) {
             formData.append("note", note.trim());
-        } else {
-            console.warn("⚠ La nota está vacía, no se enviará.");
         }
 
         if (file) {
@@ -114,7 +123,7 @@ const addNote = async (userId, note, file) => {
         }
 
         const res = await api.post(`/clinical-history/${userId}/note`, formData);
-
+        return res.data
     } catch (error) {
         console.error("❌ Error al agregar nota clínica:", error.response?.data || error);
         throw error;
@@ -178,9 +187,9 @@ const updateUser = async (userId, userData) => {
 };
 
 // 📌 Guardar Email y Contraseña para Envío de Mails (Admin)
-const saveEmailSettings = async (email, password) => {
+const updateEmailSettings = async (service, user, pass) => {
     try {
-        const res = await api.post("/settings/email", { email, password });
+        const res = await api.put("/users/email-config", { service, user, pass });
         return res.data;
     } catch (error) {
         console.error("❌ Error al guardar email settings:", error.response?.data || error);
@@ -217,6 +226,6 @@ const getEmailSettings = async () => {
         createPatient,
         getAllPatients,
         updateUser,
-        saveEmailSettings,
+        updateEmailSettings,
         getEmailSettings
     };

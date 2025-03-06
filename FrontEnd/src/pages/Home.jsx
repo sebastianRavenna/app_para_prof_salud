@@ -8,11 +8,19 @@ const Home = () => {
       <div className="container mt-5">
       {/* ✅ About Me */}
       <section className="section">
-        <h1 className="title has-text-centered">Sobre el Profesional</h1>
-        <p className="content">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec
-          eros eget libero interdum pretium non sit amet justo.
+        <h1 className="title has-text-centered">Bienvenidos a la consulta psicológica de [Nombre de la Profesional]</h1>
+        <div className="columns is-centered is-vcentered">
+        <p className="content column is-half is-medium">
+        En nuestro espacio, la salud mental es nuestra prioridad. La Lic. [Nombre de la Profesional], psicóloga con más de [X] años de experiencia, ofrece un enfoque personalizado y profesional para acompañarte en tu proceso de bienestar emocional. Con un profundo compromiso hacia el bienestar de cada persona, trabajamos juntos para encontrar soluciones a los desafíos emocionales y psicológicos que puedan estar afectando tu vida diaria.
+
+A través de esta plataforma, podrás gestionar fácilmente tus turnos, acceder a recursos exclusivos y recibir atención personalizada que te ayudará a avanzar hacia una vida más plena y equilibrada.
+
+Con una formación sólida en [mencionar especializaciones o áreas de trabajo como terapias cognitivo-conductuales, orientación psicológica, etc.], [Nombre de la Profesionista] te brindará herramientas prácticas para mejorar tu bienestar emocional, todo en un ambiente seguro, confidencial y respetuoso.
+
+Estamos aquí para ayudarte a dar el primer paso hacia el bienestar emocional. Agenda tu turno hoy mismo y comienza tu camino hacia la salud mental.
         </p>
+        <img id="imgProfesional" className="column is-half" src="/assets/profesional2.jpg" alt="foto del profesional" />
+        </div>
       </section>
 
       {/* ✅ Sección de Artículos */}

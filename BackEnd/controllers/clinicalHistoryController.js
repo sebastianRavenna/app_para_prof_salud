@@ -3,11 +3,13 @@ import { User } from '../models/userModel.js'
 
 const getClinicalHistory = async (req, res) => {
   try {
-    if (!req.session.user) {
-      return res.status(401).json({ msg: "No autorizado" });
-    }
-    
+    console.log("entrando al get del backend")
     const history = await ClinicalHistory.findOne({ user: req.params.id });
+    
+    if (req.user.role !== "admin" && req.user.id !== req.params.id) {
+      return res.status(403).json({ message: "Acceso denegado" });
+    }
+
     if (!history) return res.status(404).json({ msg: "Historia clínica no encontrada" });
     res.json(history);
   } catch (error) {

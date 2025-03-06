@@ -8,6 +8,7 @@ import { Appointments } from "../pages/Appointment";
 import { AdminPanel } from "../pages/AdminPanel";
 import { ProtectedRoute } from "../components/ProtectedRoute"
 import { AdminPatient } from "../pages/AdminPatient";
+import { Profile } from "../pages/Profile";
 const AppRouter = () => {
     return (
        <AuthProvider>
@@ -19,7 +20,8 @@ const AppRouter = () => {
 
                     {/* 🔒 Protegemos rutas */}
                     {/*Rutas de pacientes*/}
-                    <Route path="/appointments" element={<ProtectedRoute role="patient"><Appointments /></ProtectedRoute>} />
+                    <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     
                     {/*Rutas del profesional*/}
                     <Route path="/admin/turnos" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} />

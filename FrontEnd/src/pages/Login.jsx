@@ -13,44 +13,25 @@ const Login = () => {
   
 
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await login(email, password, navigate);
-     /*  window.location.reload(); */
+    const credentials = { email, password };
+    login(credentials);
+    /* try {
+      await login({ email, password });
     } catch (error) {
-      console.error("Error al iniciar sesión:", error);
-      setMessage("❌ Error en el usuario y/o la contraseña.");
+      setMessage(error.response?.data?.message || "Error en el inicio de sesión");
     }
-    
+  }; */
   };
   
   useEffect(() => {
     if (user) {
-      if (user.role === "admin") {
-        navigate("/admin/turnos"); // Redirige a la página del Admin
-      } else {
-        navigate("/appointments"); // Redirige a los turnos si no es admin
-      }
+      console.log(user.role)
+      navigate(user.role === "admin" ? "/admin/turnos" : "/appointments");
     }
   }, [user, navigate]);
   
-
-  /* const testConnection = async () => {
-    try {
-      const res = await fetch("http://localhost:3000/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "juan@example.com", password: "123456" })
-      });
-      const data = await res.json();
-      console.log("Respuesta del backend:", data);
-    } catch (error) {
-      console.error("Error en la conexión:", error);
-    }
-  }; */
-  
-
   return (
     <Layout>
     <div className="container mt-5">

@@ -1,26 +1,25 @@
-import { useContext, useEffect } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-const ProtectedRoute = ({ children, role }) => {
-  const { user, loading } = useContext(AuthContext);
-  const navigate = useNavigate(); 
+const ProtectedRoute = ({ children }) => {
+  const { loading, user, isAuthenticated } = useContext(AuthContext);
+  const location = useLocation();
 
-  useEffect(() => {
-    
-    if (user) {
-      if (user?.role === "admin") {
-        navigate("/admin/turnos"); // Redirige a la página del Admin
-      } else {
-        navigate("/appointments"); // Redirige a los turnos si no es admin
-      }
-    }
-  }, [user, navigate]);
+   if (loading){ 
+    return (
+      <div className="is-flex is-justify-content-center is-align-items-center" style={{height: '100vh'}}>
+        <span className="loader">Cargando...</span>
+      </div>
+    );
+  }
+  if (!isAuthenticated) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+  /* if (role && user.role !== role) {
+    return <Navigate to="/" />;
+  } */
   
-  if (loading) return <p>Cargando...</p>;  // Evita redirigir antes de saber el estado
-  
-  if (!user) return <Navigate to="/" />;
-
   return children;
 };
 

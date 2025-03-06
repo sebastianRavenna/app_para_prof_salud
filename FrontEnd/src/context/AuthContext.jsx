@@ -2,68 +2,77 @@ import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
+const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); //
-
-  const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
+  const [token, setToken] = useState(null);
   
   useEffect(() => {
-    const checkUser = async () => {
-      console.log("🔵 Comprobando sesión en el frontend...");
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    if (storedToken && storedUser !== "undefined") {
       try {
-        const res = await axios.get(`${API_URL}/api/users/session`, 
-          { withCredentials: true });
-        console.log("✅ Sesión encontrada en el frontend:", res.data);
-        setUser(res.data);
+        const parsedUser = JSON.parse(storedUser)
+        setToken(storedToken);
+        setUser(parsedUser);
         setIsAuthenticated(true);
         
       } catch (error) {
-        if (error.response?.status !== 401) {
-          console.error("Error al verificar usuario:", error);
-        }
-        setUser(null);
+        console.error("Error al parsear storedUser", error);
         setIsAuthenticated(false);
       }
-      setLoading(false);
-    };
-    checkUser();
-  }, [API_URL]); 
-  
-  const login = async (email, password) => {
-    console.log("🔵 Enviando login con:", email, password);
-    try {
-      const res = await axios.post(`${API_URL}/api/users/login`, 
-        { email, password }, 
-        { withCredentials: true, }
-      );
-      console.log("✅ Login exitoso, respuesta del backend:", res.data);
-      setUser(res.data);
-      setIsAuthenticated(true); 
-      /* return res.data; */
-    } catch (error) {
-      console.error("Error en login:", error.response?.data || error.message);
-      throw error; 
-    }
-  };
-  
-
-    const logout = async () => {
-    try {
-      await axios.post(`${API_URL}/api/users/logout`, {}, { withCredentials: true });
-      setUser(null);
+    } else {
+      console.log("🔴 No hay usuario autenticado");
       setIsAuthenticated(false);
-      
-    } catch (error) {
-      console.error("Error en logout:", error.response?.data || error.message);
-      throw error;
     }
-  };  
+    setLoading(false);
+  }, []);
+  
+ const login = async (credentials) => {
+   try {
+     const response = await axios.post(`${API_URL}/api/users/login`, credentials);
+     console.log("axios response", response.data)
+     const { token, userId } = response.data;  // Asume que el backend devuelve `user` y `token`
 
+     const userResponse = await axios.get(`${API_URL}/api/users/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+     const user = userResponse.data;
+
+     localStorage.setItem("token", token);
+     localStorage.setItem("user", JSON.stringify(user));
+
+     setToken(token);
+     setUser({ id: userId });
+     setIsAuthenticated(true);
+     setLoading(false)
+
+     console.log("✅ Login exitoso:", response.data);
+  } catch (error) {
+     console.error("❌ Error en login:", error);
+     throw error;
+  }
+};
+
+const logout = async () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  setUser(null);
+  setIsAuthenticated(false);
+/*delete api.defaults.headers.common["Authorization"]; */
+};
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, userId: user?.id }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      loading, 
+      isAuthenticated, 
+      token
+      }}>
       {children}
     </AuthContext.Provider>
   );

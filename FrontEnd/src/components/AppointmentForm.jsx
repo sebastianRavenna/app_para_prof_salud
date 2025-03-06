@@ -2,9 +2,10 @@ import { useState, useContext } from "react";
 import { requestAppointment } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+/* import { toast } from "react-toastify"; */
 
 const AppointmentForm = () => {
-  const { token } = useContext(AuthContext);
+  /* const { token } = useContext(AuthContext); */
   const [date, setDate] = useState("");
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState("");
@@ -12,22 +13,18 @@ const AppointmentForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!date || !reason) {
-      setMessage("Todos los campos son obligatorios.");
-      return;
-    }
 
     try {
-      const response = await requestAppointment(date, reason, token);
-      if (response.data && response.data.appointment) {
+      const response = await requestAppointment(date, reason);
+      /* if (response.data && response.data.appointment) {
         addAppointment(response.data.appointment);
-      }
+      } */
       setMessage("✅ Turno solicitado correctamente.");
       setDate("");
       setReason("");
-      window.location.reload("/Dashboard");
-      window.location.reload("/admin" );
+      navigate("/appointments")
     } catch (error) {
+      const errorMessage = error.response?.data?.message || "Error al solicitar el turno";
       setMessage("❌ Error al solicitar el turno.");
     }
   };
@@ -46,6 +43,7 @@ const AppointmentForm = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
+              min={new Date().toISOString().slice(0, 16)} // Evitar fechas pasadas
             />
           </div>
         </div>
@@ -58,6 +56,8 @@ const AppointmentForm = () => {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               required
+              maxLength={500} // Limitar longitud
+              placeholder="Describe brevemente el motivo de tu consulta"
             ></textarea>
           </div>
         </div>

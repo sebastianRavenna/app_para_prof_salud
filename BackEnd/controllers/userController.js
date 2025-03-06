@@ -1,5 +1,6 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -19,7 +20,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  console.log("🔵 Login recibido con:", email, password);
+
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Usuario no encontrado" });
@@ -27,30 +28,42 @@ const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Contraseña incorrecta" });
 
-    // Guardamos la sesión del usuario
+    /* Guardamos la sesión del usuario
     req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role };
-    console.log("datos de sesion: ", req.session.user)
+    console.log("datos de sesion: ", req.session.user) */
 
-    res.status(200).json({ message: "Inicio de sesión exitoso", userId: user._id });
+    // 🔹 Generamos un token JWT con los datos del usuario
+    const token = jwt.sign(
+      { id: user._id, name: user.name, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({ 
+      message: "Inicio de sesión exitoso", 
+      token, 
+      userId: user._id });
   } catch (error) {
     res.status(500).json({ message: "Error en el login" });
   }
 };
 
-const logOutUser = (req, res) => {
+/* const logOutUser = (req, res) => {
     req.session.destroy(() => {
         res.status(200).json({ message: "Sesión cerrada correctamente" });
     });
+}; */
+
+// 🔹 Ya no se necesita la función de logout con sesiones
+const logOutUser = (req, res) => {
+  return res.status(200).json({ message: "Logout exitoso. Elimina el token en el frontend" });
 };
 
+// 🔹 Obtiene el usuario desde el token JWT
 const getUserSession = (req, res) => {
-  console.log("🔵 Verificando sesión...");
-  console.log("🟡 Sesión actual:", req.session);
-    if (!req.session.user) {
-      console.log("✅ Usuario autenticado:", req.session.user);return res.status(401).json({ message: "No autenticado" });
-    } else {
-        console.log("❌ No hay sesión activa");
-        res.status(200).json(req.session.user);}
+  if (!req.user) return res.status(401).json({ message: "No autenticado" });
+
+  res.status(200).json(req.user);
 };
 
 const updateUser = async (req, res) => {
@@ -61,7 +74,7 @@ const updateUser = async (req, res) => {
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
   
-      if (req.session.user.id !== user._id.toString() && req.session.user.role !== "admin") {
+      if (req.user.id !== user._id.toString() && req.user.role !== "admin") {
           return res.status(403).json({ message: "No tienes permiso para modificar este usuario" });
         }
   
@@ -74,6 +87,23 @@ const updateUser = async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: "Error al actualizar usuario" });
     }
+};
+
+const getUserProfile = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No autorizado" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password"); // Excluye la contraseña
+
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error al obtener el perfil:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
 };
 
 const getUserById = async (req, res) => {
@@ -123,6 +153,7 @@ export {
   logOutUser, 
   getUserSession, 
   updateUser, 
+  getUserProfile,
   getUserById, 
   updateEmailConfig,
   getAllPatients

@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import session from 'express-session';
 import dotenv from 'dotenv';
 import MongoStore from 'connect-mongo';
 import { connectDB } from './config/connectDB.js'
@@ -20,41 +19,16 @@ const LOCAL_HOST = process.env.LOCAL_HOST
 connectDB();
 
 app.use(
-  session({
-    secret: "supersecreto", // Clave para cifrar la sesión
-    resave: false, // No guarda la sesión si no se modifica
-    saveUninitialized: true, // No crea sesiones vacías
-    store: MongoStore.create({
-    mongoUrl: process.env.URI_DB,
-    collectionName: "sessions",
-    }),
-    cookie: { 
-      secure: process.env.NODE_ENV === "production", // Solo se envía por HTTPS  
-      httpOnly: true, 
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
-/*      maxAge: 86400000,
-       domain: 'localhost',
-      path: '/'
- */    }, 
-  })
-);
-
-app.use(
     cors({
       origin: LOCAL_HOST,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true, // Permite enviar cookies y headers de autenticación */
+      /* credentials: true, Permite enviar cookies y headers de autenticación */ 
     })
   );
 
-  app.use(express.json());
-  /* app.use((req, res, next) => { next() }); */
-
-/* setInterval(() => {
-    sendReminders();
-  }, 24 * 60 * 60 * 1000);  */// Ejecuta cada 24 horas
-
+app.use(express.json());
+  
 app.use('/api/users', userRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/articles", articleRoutes);

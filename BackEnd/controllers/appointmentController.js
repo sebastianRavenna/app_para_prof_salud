@@ -3,17 +3,20 @@ import { sendEmail } from '../config/email.js';
 import { emailTemplates } from '../utils/emailTemplates.js';
 import { User } from '../models/userModel.js'
 import { ClinicalHistory } from '../models/clinicalHistoryModel.js';
+import jwt from 'jsonwebtoken';
 
 // 📌 1️⃣ Paciente solicita un turno
 const requestAppointment = async (req, res) => {
     try {
-      if (!req.session.user) {
-        return res.status(401).json({ message: "No autorizado. Falta autenticación." });
-      }
+      const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "No autorizado, falta autenticación." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const patientId = decoded.id;
       
       const { date, reason } = req.body;
-      const patientId = req.session.user.id;
-
       let history = await ClinicalHistory.findOne({ user: patientId });
 
       if (!history) {
@@ -45,47 +48,57 @@ const requestAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
     try {
       const { id } = req.params;
-      const appointment = await Appointment.findById(id);
+      console.log(`📌 Intentando cancelar turno con ID: ${id}`);
 
+      const appointment = await Appointment.findById(id);
       if (!appointment) {
+        console.log("🚨 Turno no encontrado");
         return res.status(404).json({ message: "Turno no encontrado" });
       }
 
-      const isPatient = appointment.patient.toString() === req.session.user.id;
-      const isAdmin = req.session.user.role === "admin";
+      console.log(`📌 Turno encontrado: ${appointment}`);
+
+      const isPatient = appointment.patient.toString() === req.user.id;
+      const isAdmin = req.user.role === "admin";
 
       if (!isPatient && !isAdmin){
+        console.log("⛔ No autorizado para cancelar este turno");
         return res.status(403).json({ message: "No autorizado para cancelar este turno" });
       }
   
+      console.log("✅ Usuario autorizado. Eliminando turno...");
       await Appointment.findByIdAndDelete(id);
 
       //envio de mail
-      /* await sendEmail(
+       /* await sendEmail(
         appointment.patient.email,
         "Turno Cancelado",
         emailTemplates.appointmentCancelled(appointment.patient.username, appointment.date.toLocaleString("es-AR"))
-      ); */
+      );  */
 
       res.status(200).json({ message: "Turno cancelado" });
     } catch (error) {
+      console.error("❌ Error en el backend al cancelar turno:", error);
       res.status(500).json({ message: "Error al cancelar turno" });
     }
-  };
+  }; 
+
+  
   
   // 📌 Paciente ve sus turnos
   const getPatientAppointments = async (req, res) => {
     try {
-      if (!req.session.user) {
-          return res.status(401).json({ message: "No autorizado" });
-      }
+      const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+      console.log(token)
+    if (!token) {
+      return res.status(401).json({ message: "No autorizado" });
+    }
 
-      const appointments = await Appointment.find({ patient: req.session.user.id });
-      /* console.log("✅ Appointments encontrados:", appointments); */
-      
-      return res.json(appointments);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const appointments = await Appointment.find({ patient: decoded.id });
+    
+    res.json(appointments);
   } catch (error) {
-      console.error("❌ Error:", error);
       return res.status(500).json({ message: "Error al obtener turnos" });
   }
 };

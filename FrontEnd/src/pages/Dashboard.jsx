@@ -4,17 +4,15 @@ import { getPatientAppointments, cancelAppointment } from "../services/api";
 
 const Dashboard = () => {
 
-  const { user } = useContext(AuthContext);
+  /* const { user } = useContext(AuthContext); */
   const [appointments, setAppointments] = useState([]);
   const [error, setError] = useState(null); 
+  const token = localStorage.getItem("token")
+  const user = localStorage.getItem("user")
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      if (!user) {
-        console.log("⚠️ No hay usuario autenticado");
-        return;
-    }
-        try {
+      try {
         const data = await getPatientAppointments();
         setAppointments(data);
 
@@ -22,12 +20,15 @@ const Dashboard = () => {
         setError(error.message);
       }
     };
+    if(user){
     fetchAppointments();
+    }
 }, [user]);
  
   const handleCancel = async (id) => {
     if (!window.confirm("¿Seguro que quieres cancelar este turno?")) return;
     try {
+      console.log(id, user)
       await cancelAppointment(id, user);
       setAppointments(appointments.filter(app => app._id !== id));
     } catch (error) {
