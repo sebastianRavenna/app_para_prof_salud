@@ -10,9 +10,6 @@ const Appointments = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("Usuario en contexto:", user);
-    console.log(user._id)
-
     if (!user || !user._id) {
       console.warn("No hay usuario autenticado o no tiene ID");
       return;
@@ -20,10 +17,8 @@ const Appointments = () => {
     
     const fetchAppointments = async () => {
       try {
-        console.log("Obteniendo turnos para usuario:", user._id);
         const data = await getPatientAppointments();
-        console.log("Turnos obtenidos:", data);
-        setAppointments(data || []);
+        setAppointments(data.sort((a, b) => new Date (a.date) - new Date (b.date)) || []);
       } catch (error) {
         console.error("Error al obtener turnos:", error);
         setError(error.message);
@@ -33,15 +28,15 @@ const Appointments = () => {
   }, [user]);
 
   const addAppointment = (newAppointment) => {
-    if (!newAppointment) return;
-    setAppointments((prevAppointments) => [...prevAppointments, newAppointment]);
+    setAppointments([...appointments, newAppointment].sort((a, b) => 
+      new Date(a.date) - new Date(b.date)
+    ));
   };
 
   const handleCancel = async (id) => {
     if (!window.confirm("¿Seguro que quieres cancelar este turno?")) return;
     try {
       await cancelAppointment(id, user);
-      console.log("id seleccionado", id)
       setAppointments(appointments.filter(app => app._id !== id));
     } catch (error) {
       console.error("Error al cancelar turno", error);
@@ -50,15 +45,15 @@ const Appointments = () => {
 
   return (
     <><Layout>
-        <div className="container mt-5">
-            <h1 className="title has-text-centered">Gestión de Turnos</h1>
-            <div className="columns">
-                <div className="column is-half">
-                  <AppointmentForm addAppointment={addAppointment} />
-                </div>
-                
-                <div className="column is-half">
-            <h2 className="subtitle has-text-centered">Mis Turnos</h2>
+      <div className="container mt-5">
+          <h1 className="title has-text-centered">Gestión de Turnos</h1>
+          <div className="columns">
+            <div className="column is-half">
+              <AppointmentForm addAppointment={addAppointment} />
+            </div>
+            
+            <div className="column is-half">
+            <h2 className="title has-text-centered">Mis Turnos</h2>
             {error && <p className="notification is-danger">{error}</p>}
             {appointments.length === 0 ? (
               <p className="notification is-info">No tienes turnos agendados.</p>
@@ -75,15 +70,12 @@ const Appointments = () => {
                 <tbody>
                   {appointments.map((appointment) => (
                     <tr key={appointment._id}>
-                      <td>{new Date(appointment.date).toLocaleDateString()}</td>
-                      <td>{new Date(appointment.date).toLocaleTimeString()}</td>
+                      <td>{new Date(appointment.date).toLocaleDateString("es-AR")}</td>
+                      <td>{new Date(appointment.date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}</td>
                       <td>{appointment.status}</td>
                       <td>
-                        <button
-                          className="button is-danger is-small"
-                          onClick={() => handleCancel(appointment._id)}
-                        >
-                          Cancelar
+                        <button className="button is-danger is-small" onClick={() => handleCancel(appointment._id)}>
+                          Cancelar Turno
                         </button>
                       </td>
                     </tr>
@@ -92,8 +84,8 @@ const Appointments = () => {
               </table>
             )}
           </div>
-            </div>
         </div>
+      </div>
     </Layout> 
     </>
   );

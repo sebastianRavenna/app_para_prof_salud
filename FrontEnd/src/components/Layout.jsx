@@ -17,13 +17,13 @@ const Layout = ({ children }) => {
     <>
       <header>
         <nav 
-          className="navbar is-primary px-6" 
+          className="navbar is-primary px-6 p-3" 
           role="navigation" 
           aria-label="main navigation"
         >
           <div className="navbar-brand">
             <Link to="/" className= "navbar-item" >
-              <img src="/assets/logo.png" alt="" />
+              <img src="/assets/logo.png" alt="logo" id="logoNav" />
             </Link>
           </div>
 

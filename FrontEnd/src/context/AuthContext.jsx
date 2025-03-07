@@ -35,7 +35,7 @@ const AuthProvider = ({ children }) => {
    try {
      const response = await axios.post(`${API_URL}/api/users/login`, credentials);
      console.log("axios response", response.data)
-     const { token, userId } = response.data;  // Asume que el backend devuelve `user` y `token`
+     const { token } = response.data;  // Asume que el backend devuelve `user` y `token`
 
      const userResponse = await axios.get(`${API_URL}/api/users/profile`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
      localStorage.setItem("user", JSON.stringify(user));
 
      setToken(token);
-     setUser({ id: userId });
+     setUser(user);
      setIsAuthenticated(true);
      setLoading(false)
 

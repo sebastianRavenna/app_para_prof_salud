@@ -100,7 +100,6 @@ const AdminPatient = () => {
           await scheduleAppointment(selectedPatientId, appointmentForm.date, appointmentForm.reason);
           setAppointmentForm({ patientId: "", date: "", reason: ""});
           fetchAppointments(selectedPatientId);
-          console.log(selectedPatientId)
       } catch (error) {
           console.error("❌ Error al agendar turno:", error);
       }
@@ -214,49 +213,50 @@ const AdminPatient = () => {
                         <h3 className="title is-5">{patients.find(p => p._id === selectedPatientId)?.name || ""}</h3>
         
                         <div className="field">
-    <label className="label">Fecha y Hora</label>
-    <div className="field has-addons">
-      <div className="control">
-        <input 
-          className="input" 
-          type="date" 
-          name="date" 
-          value={appointmentForm.date?.split('T')[0] || ''} 
-          onChange={handleAppointmentChange} 
-          required 
-        />
-      </div>
-      <div className="control">
-        <div className="select">
-          <select 
-            name="time"
-            value={appointmentForm.date?.split('T')[1] || ''}
-            onChange={(e) => {
-              const date = appointmentForm.date?.split('T')[0] || new Date().toISOString().split('T')[0];
-              setAppointmentForm({
-                ...appointmentForm,
-                date: `${date}T${e.target.value}`
-              });
-            }}
-            required
-          >
-           {Array.from({ length: 12 }, (_, index) => {  // 16 horas desde 8:00 hasta 23:00
-              const hour = index + 8; // Empezamos desde la hora 8
-              const formattedHour = hour.toString().padStart(2, '0');
-              return Array.from({ length: 6 }, (_, minuteIndex) => {
-                const minutes = (minuteIndex * 10).toString().padStart(2, '0');
-                return (
-                  <option key={`${formattedHour}:${minutes}`} value={`${formattedHour}:${minutes}`}>
-                    {`${formattedHour}:${minutes}`}
-                  </option>
-                );
-              });
-            }).flat()}
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
+                            <label className="label">Fecha y Hora</label>
+                            <div className="field has-addons">
+                                <div className="control">
+                                    <input 
+                                    className="input" 
+                                    type="date" 
+                                    name="date" 
+                                    value={appointmentForm.date?.split('T')[0] || ''} 
+                                    onChange={handleAppointmentChange} 
+                                    required 
+                                    />
+                                </div>
+
+                                <div className="control">
+                                    <div className="select">
+                                    <select 
+                                        name="time"
+                                        value={appointmentForm.date?.split('T')[1] || ''}
+                                        onChange={(e) => {
+                                            const date = appointmentForm.date?.split('T')[0] || new Date().toISOString().split('T')[0];
+                                            setAppointmentForm({
+                                                ...appointmentForm,
+                                                date: `${date}T${e.target.value}`
+                                            });
+                                        }}
+                                        required
+                                    >
+                                        {Array.from({ length: 12 }, (_, index) => {  // 16 horas desde 8:00 hasta 23:00
+                                        const hour = index + 8; // Empezamos desde la hora 8
+                                        const formattedHour = hour.toString().padStart(2, '0');
+                                        return Array.from({ length: 6 }, (_, minuteIndex) => {
+                                            const minutes = (minuteIndex * 10).toString().padStart(2, '0');
+                                            return (
+                                            <option key={`${formattedHour}:${minutes}`} value={`${formattedHour}:${minutes}`}>
+                                                {`${formattedHour}:${minutes}`}
+                                            </option>
+                                            );
+                                        });
+                                        }).flat()}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="field">
                             <label className="label">Motivo</label>

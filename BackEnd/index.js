@@ -2,12 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import MongoStore from 'connect-mongo';
-import { connectDB } from './config/connectDB.js'
+import { connectDB } from './config/connectDB.js';
 import { userRoutes } from './routes/userRoutes.js';
 import { appointmentRoutes } from './routes/appointmentRoutes.js';
 import { articleRoutes } from './routes/articleRoutes.js';
-import { sendReminders } from './controllers/appointmentController.js'
+import { sendReminders } from './controllers/appointmentController.js';
 import { clinicalHistoryRouter } from './routes/clinicalHistoryRoutes.js';
+
+
 dotenv.config();
 
 /* process.loadEnvFile(); */
@@ -19,16 +21,16 @@ const LOCAL_HOST = process.env.LOCAL_HOST
 connectDB();
 
 app.use(
-    cors({
-      origin: LOCAL_HOST,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      /* credentials: true, Permite enviar cookies y headers de autenticación */ 
-    })
-  );
+  cors({
+    origin: LOCAL_HOST,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    /* credentials: true, Permite enviar cookies y headers de autenticación */ 
+  })
+);
 
 app.use(express.json());
-  
+
 app.use('/api/users', userRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/articles", articleRoutes);
