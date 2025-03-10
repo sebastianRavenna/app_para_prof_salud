@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <>
+    <div className="layout">
       <header>
         <nav 
           className="navbar is-primary px-6 p-3" 
@@ -82,18 +82,16 @@ const Layout = ({ children }) => {
         </nav>
       </header>
 
-      <section className="section">
-        <div className="container">
+        <main className="layout-content">
           {children}
-        </div>
-      </section>
+        </main>
 
-      <footer className="footer">
+      <footer className="footer has-background-primary">
         <div className="content has-text-centered">
           <p>&copy; 2025 MiApp. Todos los derechos reservados.</p>
         </div>
       </footer>
-    </>
+    </div>
   );
 };
 
