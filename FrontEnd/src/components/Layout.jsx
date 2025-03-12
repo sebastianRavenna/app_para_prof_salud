@@ -49,14 +49,14 @@ const Layout = ({ children }) => {
                     Admin Patients
                   </Link>
                 </>
-              ) : (
+              ) : user?.role === "patient" ? (
                 <Link 
                   to="/appointments" 
                   className={`navbar-item ${isActive("/appointments")}`}
                 >
                   Appointments
                 </Link>
-              )}
+              ) : null}
             </div>
 
             <div className="navbar-end">
@@ -70,12 +70,20 @@ const Layout = ({ children }) => {
                   </button>
                 </div>
               ) : (
+                <>
+                <Link 
+                  to="/register" 
+                  className={`navbar-item ${isActive("/register")}`}
+                  >
+                  Register
+                </Link>,
                 <Link 
                   to="/login" 
                   className={`navbar-item ${isActive("/login")}`}
                 >
                   Login
                 </Link>
+                </>
               )}
             </div>
           </div>

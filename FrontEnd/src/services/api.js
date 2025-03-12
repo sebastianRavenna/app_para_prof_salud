@@ -152,7 +152,7 @@ const editNote = async (userId, noteId, note) => {
     }
 };
 
-        // 📌 Crear nuevo usuario (Admin)
+        // 📌 Crear nuevo usuario (Admin y Paciente)
 const createPatient = async (name, email, password, role) => {
     try {
         const res = await api.post("/users/register", { name, email, password, role });
@@ -208,6 +208,15 @@ const getEmailSettings = async () => {
     }
 };
 
+const verifyCode = async (email, code) => {
+    try {
+        const res = await api.post("/users/verify", { email, code });
+        return res.data;
+    } catch (error) {
+        console.error ("codigo equivocado")
+        throw error;
+    }
+};
 
 
     export { 
@@ -224,8 +233,10 @@ const getEmailSettings = async () => {
         removeNote,
         editNote,
         createPatient,
+        /* confirmPatient, */
         getAllPatients,
         updateUser,
         updateEmailSettings,
-        getEmailSettings
+        getEmailSettings,
+        verifyCode
     };

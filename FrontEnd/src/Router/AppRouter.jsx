@@ -9,6 +9,7 @@ import { AdminPanel } from "../pages/AdminPanel";
 import { ProtectedRoute } from "../components/ProtectedRoute"
 import { AdminPatient } from "../pages/AdminPatient";
 import { Profile } from "../pages/Profile";
+import { VerifyAccount } from "../pages/VerifyAccount";
 const AppRouter = () => {
     return (
        <AuthProvider>
@@ -17,6 +18,7 @@ const AppRouter = () => {
                     <Route path="/" element={<Home />} />
                     <Route path="/Login" element={<Login />} />
                     <Route path="/Register" element={<Register />} />
+                    <Route path="/VerifyAccount" element={<VerifyAccount />} />
 
                     {/* 🔒 Protegemos rutas */}
                     {/*Rutas de pacientes*/}

@@ -16,12 +16,12 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    if (decoded.exp * 1000 < Date.now()){
+    /* if (decoded.exp * 1000 < Date.now()){
       return res.status(401).json({ 
         message: "Token expirado", 
         error: "El token de autenticación ha caducado" 
       });
-    }
+    } */
 
     req.user = decoded; // Guarda los datos del usuario en req.user
     next();

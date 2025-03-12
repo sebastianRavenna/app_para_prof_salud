@@ -1,6 +1,7 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { sendVerificationEmail } from "../utils/emailService.js";
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -9,12 +10,43 @@ const registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: "El usuario ya existe" });
 
-    const newUser = new User({ name, email, password });
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Código de 6 dígitos
+
+    const newUser = new User({ name, email, password, verificationCode });
     await newUser.save();
 
+    
+    await sendVerificationEmail(email, verificationCode);
     res.status(201).json({ message: "Usuario registrado correctamente" });
   } catch (error) {
     res.status(500).json({ message: "Error en el registro" });
+  }
+};
+
+const verifyUser = async (req, res) => {
+  const { email, code } = req.body;
+  console.log("Datos recibidos en el servidor:", { email, code });
+
+  try {
+    const user = await User.findOne({ email });
+    console.log("Usuario encontrado:", user);
+
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+    if (user.isVerified) return res.status(400).json({ message: "Usuario ya verificado" });
+
+    if (user.verificationCode === code) {
+      console.log("Códigos coinciden, verificando usuario...");
+      user.isVerified = true;
+      user.verificationCode = null;
+      await user.save();
+      return res.status(200).json({ message: "Cuenta verificada. Ya puedes iniciar sesión." });
+    } else {
+      console.log("Códigos no coinciden o usuario no encontrado.");
+      return res.status(400).json({ message: "Código incorrecto" });
+    }
+  } catch (error) {
+    console.error("Error en el proceso de verificación:", err);
+    res.status(500).json({ message: "Error en la verificación" });
   }
 };
 
@@ -25,12 +57,12 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Usuario no encontrado" });
 
+    if (!user.isVerified) {
+      return res.status(400).json({ message: "Debes verificar tu email antes de iniciar sesión." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Contraseña incorrecta" });
-
-    /* Guardamos la sesión del usuario
-    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role };
-    console.log("datos de sesion: ", req.session.user) */
 
     // 🔹 Generamos un token JWT con los datos del usuario
     const token = jwt.sign(
@@ -48,18 +80,10 @@ const loginUser = async (req, res) => {
   }
 };
 
-/* const logOutUser = (req, res) => {
-    req.session.destroy(() => {
-        res.status(200).json({ message: "Sesión cerrada correctamente" });
-    });
-}; */
-
-// 🔹 Ya no se necesita la función de logout con sesiones
 const logOutUser = (req, res) => {
   return res.status(200).json({ message: "Logout exitoso. Elimina el token en el frontend" });
 };
 
-// 🔹 Obtiene el usuario desde el token JWT
 const getUserSession = (req, res) => {
   if (!req.user) return res.status(401).json({ message: "No autenticado" });
 
@@ -149,6 +173,7 @@ const getAllPatients = async (req, res) => {
 
 export { 
   registerUser, 
+  verifyUser,
   loginUser, 
   logOutUser, 
   getUserSession, 

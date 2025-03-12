@@ -1,37 +1,52 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { createPatient } from "../services/api";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { ToastContainer, toast } from 'react-toastify';
-
-
-
+import { ToastContainer, toast } from "react-toastify";
+import { FaEye, FaEyeSlash  } from "react-icons/fa";
 
 const Register = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
+      phone: "",
       password: "",
+      confirmPassword: "",
       role: "patient",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("El nombre es obligatorio"),
       email: Yup.string().email("Email inválido").required("El email es obligatorio"),
+      phone: Yup.string().optional(),
       password: Yup.string()
-      .min(6, "⚠️ Mínimo 6 caracteres. Al menos una mayúscula, una minuscula y un número")
-      .matches(/[A-Z]/, "⚠️ Mínimo 8 caracteres. Al menos una mayúscula, una minuscula y un número")
-      .matches(/[a-z]/, "⚠️ Mínimo 8 caracteres. Al menos una mayúscula, una minuscula y un número")
-      .matches(/[0-9]/, "⚠️ Mínimo 8 caracteres. Al menos una mayúscula, una minuscula y un número")
-      .required("La contraseña es obligatoria"),
+        .min(6, "⚠️ Mínimo 6 caracteres. Al menos una mayúscula, una minuscula y un número")
+        .matches(/[A-Z]/, "⚠️ Mínimo 6 caracteres. Al menos una mayúscula, una minuscula y un número")
+        .matches(/[a-z]/, "⚠️ Mínimo 6 caracteres. Al menos una mayúscula, una minuscula y un número")
+        .matches(/[0-9]/, "⚠️ Mínimo 6 caracteres. Al menos una mayúscula, una minuscula y un número")
+        .required("La contraseña es obligatoria"),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir")
+        .required("Confirmar la contraseña es obligatorio"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
         await createPatient(values.name, values.email, values.password, values.role);
-        toast('¡Registro exitoso!', {
+        toast("¡Registro exitoso! Valida tu Email", {
           position: "top-right",
           autoClose: 1500,
           hideProgressBar: false,
@@ -40,7 +55,7 @@ const Register = () => {
           draggable: true,
           progress: undefined,
           theme: "light",
-          onClose: () => navigate("/login")
+          onClose: () => navigate(`/verifyAccount?email=${values.email}`),
         });
       } catch (err) {
         toast(err.response?.data?.msg || "Error en el registro", { position: "top-right" });
@@ -53,130 +68,69 @@ const Register = () => {
     <Layout>
       <ToastContainer />
       <section className="register-section">
-                <div className="card register-card">
-                  <div className="card-content">
-                    <h2 className="title has-text-centered">Registro</h2>
-                    <form onSubmit={formik.handleSubmit}>
-                      <div className="field">
-                        <label className="label">Nombre</label>
-                        <input
-                          className={`input ${formik.touched.name && formik.errors.name ? "is-danger" : ""}`}
-                          type="text"
-                          name="name"
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          value={formik.values.name}
-                        />
-                        {formik.touched.name && formik.errors.name && <p className="help is-danger">{formik.errors.name}</p>}
-                      </div>
-                      <div className="field">
-                        <label className="label">Email</label>
-                        <input
-                          className={`input ${formik.touched.email && formik.errors.email ? "is-danger" : ""}`}
-                          type="email"
-                          name="email"
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          value={formik.values.email}
-                        />
-                        {formik.touched.email && formik.errors.email && <p className="help is-danger">{formik.errors.email}</p>}
-                      </div>
-                      <div className="field">
-                        <label className="label">Contraseña</label>
-                        <input
-                          className={`input ${formik.touched.password && formik.errors.password ? "is-danger" : ""}`}
-                          type="password"
-                          name="password"
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          value={formik.values.password}
-                        />
-                        {formik.touched.password && formik.errors.password && <p className="help is-danger">{formik.errors.password}</p>}
-                      </div>
-                      <button className="button is-primary is-fullwidth" type="submit" disabled={formik.isSubmitting}>
-                        {formik.isSubmitting ? "Registrando..." : "Registrarse"}
-                      </button>
-                    </form>
-                    <div className="has-text-centered mt-4">
-                    <p className="has-text-grey">
-                      ¿Ya tenes cuenta?
-                      <a href="/login" className="has-text-primary has-text-weight-bold ml-1">Inicia sesion</a>
-                    </p>
-                    </div>
-                  </div>
+        <div className="card register-card">
+          <div className="card-content">
+            <h2 className="title has-text-centered">Registro</h2>
+            <form onSubmit={formik.handleSubmit}>
+               {["name", "email", "phone"].map(field => (
+                <div className="field" key={field}>
+                  <label className="label">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                  <input
+                    className={`input ${formik.touched[field] && formik.errors[field] ? "is-danger" : ""}`}
+                    type="text"
+                    name={field}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values[field]}
+                    placeholder={
+                      field === 'email' ? "ejemplo@gmail.com" :
+                      field === 'phone' ? "541155555555" : ""
+                    }
+                  />
+                  {formik.touched[field] && formik.errors[field] && <p className="help is-danger">{formik.errors[field]}</p>}
                 </div>
+              ))}
+
+              {["password", "confirmPassword"].map(field => (
+                <div className="field" key={field}>
+                <label className="label">{field === 'confirmPassword' ? 'Confirmar Contraseña' : 'Contraseña'}</label>
+                <div className="control has-icons-right">
+                  <input
+                    className={`input ${formik.touched[field] && formik.errors[field] ? "is-danger" : ""}`}
+                    type={field === "password" ? (showPassword ? "text" : "password") : (showConfirmPassword ? "text" : "password")}
+                    name={field}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values[field]}
+                    placeholder={field === "password" ? "Mínimo 6 caracteres" : ""}
+                  />
+                  <span 
+                    className="icon is-right eyeRegister" 
+                    onClick={field === "password" ? togglePasswordVisibility : toggleConfirmPasswordVisibility}
+                  >
+                    {field === "password" ? (showPassword ? <FaEyeSlash /> : <FaEye />) : (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
+                  </span>
+                </div>
+                {formik.touched[field] && formik.errors[field] && <p className="help is-danger">{formik.errors[field]}</p>}
+              </div>
+              ))}
+              <button className="button is-primary is-fullwidth" type="submit" disabled={formik.isSubmitting}>
+                {formik.isSubmitting ? "Registrando..." : "Registrarse"}
+              </button>
+            </form>
+            <div className="has-text-centered mt-4">
+              <p className="has-text-grey">
+                ¿Ya tenés cuenta?
+                <a href="/login" className="has-text-primary has-text-weight-bold ml-1">
+                  Iniciá sesión
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
     </Layout>
   );
 };
 
 export { Register };
-
-
-
-
-
-
-
-
-
-
-//---------------------------------//
-
-/* import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Layout } from "../components/Layout"
-import { createPatient } from "../services/api";
-
-const Register = () => {
-  const [userData, setUserData] = useState({ name: "", email: "", password: "", role: "patient" });
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createPatient (userData.name, userData.email, userData.password, userData.role);
-      navigate("/login");
-    } catch (err) {
-      setError(err.response.data.msg || "Error en el registro");
-    }
-  };
-
-  return (
-    <>
-    <Layout>
-    <div className="container mt-5">
-      <div className="column is-half is-offset-one-quarter">
-        <h1 className="title has-text-centered">Registro</h1>
-        <form className="box" onSubmit={handleSubmit}>
-          {error && <p className="notification is-danger">{error}</p>}
-          <div className="field">
-            <label className="label">Nombre</label>
-            <input className="input" type="text" name="name" onChange={handleChange} required />
-          </div>
-          <div className="field">
-            <label className="label">Email</label>
-            <input className="input" type="email" name="email" onChange={handleChange} required />
-          </div>
-          <div className="field">
-            <label className="label">Contraseña</label>
-            <input className="input" type="password" name="password" onChange={handleChange} required />
-          </div>
-          
-          <button className="button is-primary is-fullwidth">Registrarse</button>
-        </form>
-      </div>
-    </div>
-    </Layout>
-    </>
-  );
-};
-
-export { Register };
- */

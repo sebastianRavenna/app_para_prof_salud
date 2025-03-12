@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { 
     registerUser, 
+    verifyUser,
     loginUser, 
     logOutUser, 
     getUserSession, 
@@ -17,6 +18,7 @@ import { adminMiddleware } from "../middlewares/adminMiddleware.js";
 const userRoutes = Router();
 
 userRoutes.post("/register", registerUser);
+userRoutes.post("/verify", verifyUser);
 userRoutes.post("/login", loginUser);
 userRoutes.post("/logout", logOutUser);
 userRoutes.get("/profile", authMiddleware, getUserProfile);

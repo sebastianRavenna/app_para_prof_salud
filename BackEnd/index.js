@@ -25,7 +25,6 @@ app.use(
     origin: LOCAL_HOST,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    /* credentials: true, Permite enviar cookies y headers de autenticación */ 
   })
 );
 
@@ -45,11 +44,9 @@ app.get("/test-db", async (req, res) => {
     const mongoose = await import("mongoose");
     
     // Verificar si mongoose ya está conectado
-    // Si usas import dinámico, necesitas acceder a la conexión mediante .default
     const mongooseInstance = mongoose.default || mongoose;
     
     if (!mongooseInstance.connection || mongooseInstance.connection.readyState !== 1) {
-      // Si no está conectado, intentar conectar
       const URI_DB = process.env.URI_DB;
       await mongooseInstance.connect(URI_DB);
     }
