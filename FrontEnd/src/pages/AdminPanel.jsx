@@ -106,8 +106,6 @@ const AdminPanel = () => {
 
   //funcion para CANCELAR turnos
   const handleCancel = async (id) => {
-    console.log("Usuario en contexto:", user);
-    console.log("token en contexto:", token);
     if (!window.confirm("¿Seguro que quieres cancelar este turno?")) return;
     try {
       

@@ -19,13 +19,11 @@ const AuthProvider = ({ children }) => {
         setToken(storedToken);
         setUser(parsedUser);
         setIsAuthenticated(true);
-        
       } catch (error) {
         console.error("Error al parsear storedUser", error);
         setIsAuthenticated(false);
       }
     } else {
-      console.log("🔴 No hay usuario autenticado");
       setIsAuthenticated(false);
     }
     setLoading(false);
@@ -34,7 +32,6 @@ const AuthProvider = ({ children }) => {
  const login = async (credentials) => {
    try {
      const response = await axios.post(`${API_URL}/api/users/login`, credentials);
-     console.log("axios response", response.data)
      const { token } = response.data;  // Asume que el backend devuelve `user` y `token`
 
      const userResponse = await axios.get(`${API_URL}/api/users/profile`, {
@@ -49,8 +46,6 @@ const AuthProvider = ({ children }) => {
      setUser(user);
      setIsAuthenticated(true);
      setLoading(false)
-
-     console.log("✅ Login exitoso:", response.data);
   } catch (error) {
      console.error("❌ Error en login:", error);
      throw error;

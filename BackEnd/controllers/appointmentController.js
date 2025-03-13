@@ -13,8 +13,8 @@ const requestAppointment = async (req, res) => {
       return res.status(401).json({ message: "No autorizado, falta autenticación." });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const patientId = decoded.id;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const patientId = decoded.id;
       
       const { date, reason } = req.body;
       let history = await ClinicalHistory.findOne({ user: patientId });
@@ -23,16 +23,16 @@ const requestAppointment = async (req, res) => {
         // Si no existe, la creamos
         history = new ClinicalHistory({ user: patientId });
         await history.save();
-        console.log("✅ Historia clínica creada para el usuario:", patientId);
       }
     
-      const newAppointment = new Appointment({ patient: patientId, date, reason });
+      const newAppointment = new Appointment({ 
+        patient: patientId, date: new Date(date), reason });
       await newAppointment.save();
       
-      //envio de mail
       const patient = await User.findById(patientId);
       const formattedDate = new Date(date).toLocaleString("es-AR");
-
+      
+      //envio de mail
       await sendEmail(
       patient.email,
       "Confirmación de Turno",
@@ -48,25 +48,20 @@ const requestAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(`📌 Intentando cancelar turno con ID: ${id}`);
 
       const appointment = await Appointment.findById(id);
       if (!appointment) {
-        console.log("🚨 Turno no encontrado");
         return res.status(404).json({ message: "Turno no encontrado" });
       }
 
-      console.log(`📌 Turno encontrado: ${appointment}`);
 
       const isPatient = appointment.patient.toString() === req.user.id;
       const isAdmin = req.user.role === "admin";
 
       if (!isPatient && !isAdmin){
-        console.log("⛔ No autorizado para cancelar este turno");
         return res.status(403).json({ message: "No autorizado para cancelar este turno" });
       }
   
-      console.log("✅ Usuario autorizado. Eliminando turno...");
       await Appointment.findByIdAndDelete(id);
 
       //envio de mail
@@ -89,7 +84,6 @@ const cancelAppointment = async (req, res) => {
   const getPatientAppointments = async (req, res) => {
     try {
       const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-      console.log(token)
     if (!token) {
       return res.status(401).json({ message: "No autorizado" });
     }
@@ -101,6 +95,30 @@ const cancelAppointment = async (req, res) => {
   } catch (error) {
       return res.status(500).json({ message: "Error al obtener turnos" });
   }
+};
+
+  // 📌 Paciente obtiene los turnos ocupados
+  const getBookedAppointments = async (req, res) => {
+    try {
+        const appointments = await Appointment.find().select("date -_id"); // Solo obtiene la fecha
+        const bookedTimes = appointments.map(app => {
+            const localDate = new Date(app.date);
+
+            return{ 
+            date: localDate.toLocaleDateString('en-CA'), // Formato YYYY-MM-DD
+            time: localDate.toLocaleTimeString('es-AR', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: false 
+        })
+      };
+    });
+
+        res.status(200).json(bookedTimes);
+    } catch (error) {
+        console.error("🔴 Error en getBookedAppointments:", error);
+        res.status(500).json({ message: "Error al obtener turnos ocupados" });
+    }
 };
   
   // 📌 Profesional ve todos los turnos de todos los pacientes
@@ -221,6 +239,7 @@ export {
     requestAppointment, 
     cancelAppointment, 
     getPatientAppointments, 
+    getBookedAppointments,
     getAllAppointments, 
     getAppointmentsByPatient, 
     scheduleAppointment, 

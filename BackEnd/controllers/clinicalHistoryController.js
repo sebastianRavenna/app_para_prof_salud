@@ -3,7 +3,6 @@ import { User } from '../models/userModel.js'
 
 const getClinicalHistory = async (req, res) => {
   try {
-    console.log("entrando al get del backend")
     const history = await ClinicalHistory.findOne({ user: req.params.id });
     
     if (req.user.role !== "admin" && req.user.id !== req.params.id) {

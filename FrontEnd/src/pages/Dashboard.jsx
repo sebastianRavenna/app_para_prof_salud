@@ -28,7 +28,6 @@ const Dashboard = () => {
   const handleCancel = async (id) => {
     if (!window.confirm("¿Seguro que quieres cancelar este turno?")) return;
     try {
-      console.log(id, user)
       await cancelAppointment(id, user);
       setAppointments(appointments.filter(app => app._id !== id));
     } catch (error) {

@@ -1,7 +1,6 @@
-import { useState, useContext } from "react";
-import { requestAppointment } from "../services/api";
+import { useState, useEffect } from "react";
+import { requestAppointment, getBookedAppointments } from "../services/api";
 import PropTypes from 'prop-types';
-import { AuthContext } from "../context/AuthContext";
 /* import { toast } from "react-toastify"; */
 
 const AppointmentForm = ({addAppointment}) => {
@@ -9,17 +8,42 @@ const AppointmentForm = ({addAppointment}) => {
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState("");
+  const [bookedTimes, setBookedTimes] = useState([])
   
+  useEffect(() => {
+    if (!date) return;
+
+    const fetchAppointments = async (selectedDate) => {
+      try {
+          const booked = await getBookedAppointments();
+
+          // Filtra los turnos que coincidan con la fecha seleccionada
+          const formattedBooked = booked
+              .filter(app => app.date === selectedDate) // Compara con la fecha actual seleccionada
+              .map(app => app.time); // Extrae solo las horas reservadas para ese día
+              setBookedTimes(formattedBooked);
+      } catch (error) {
+          console.error("Error al obtener turnos ocupados:", error);
+      }
+  };
+
+    fetchAppointments(date);
+  }, [date]);
+
+  // Generar horarios disponibles filtrando los ocupados
   const generateTimeOptions = () => {
     const options = [];
-    for (let hour = 8; hour <= 18; hour++) { // Rango de horario permitido
-      options.push(`${hour.toString().padStart(2, "0")}:00`);
-      options.push(`${hour.toString().padStart(2, "0")}:30`);
+    for (let hour = 8; hour <= 18; hour++) {
+      ["00", "30"].forEach(min => {
+        const timeSlot = `${hour.toString().padStart(2, "0")}:${min}`;
+        if (!bookedTimes.includes(timeSlot)) {
+          options.push(timeSlot);
+        }
+      });
     }
     return options;
   };
 
-  
   const handleAppointmentRequest = async (e) => {
     e.preventDefault();
     
@@ -27,9 +51,9 @@ const AppointmentForm = ({addAppointment}) => {
       setMessage("❌ Debes seleccionar fecha y hora.");
       return;
     }
-    
+
     const appointmentDateTime = `${date}T${time}:00`;
-    
+
     try {
       const response = await requestAppointment(appointmentDateTime, reason);
 
@@ -39,11 +63,12 @@ const AppointmentForm = ({addAppointment}) => {
         setDate("");
         setTime("");
         setReason("");
-      }else {
+        setBookedTimes(prev => [...prev, time]);
+      } else {
         console.error("Estructura de respuesta incorrecta:", response);
         setMessage("❌ Error en la estructura de la respuesta.");
       }
-      
+
     } catch (error) {
       console.error("Error completo:", error);
       const errorMessage = error.response?.data?.message || "Error al solicitar el turno";
@@ -51,9 +76,6 @@ const AppointmentForm = ({addAppointment}) => {
     }
   };
   
-  AppointmentForm.propTypes = {
-    addAppointment: PropTypes.func.isRequired,
-  }; 
   
   return (
     <div className="box">
@@ -69,7 +91,7 @@ const AppointmentForm = ({addAppointment}) => {
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
-        />
+          />
       </div>
     </div>
 
@@ -79,9 +101,9 @@ const AppointmentForm = ({addAppointment}) => {
         <div className="select">
           <select value={time} onChange={(e) => setTime(e.target.value)} required>
             <option value="">Selecciona una hora</option>
-            {generateTimeOptions().map((time) => (
-              <option key={time} value={time}>
-                {time}
+            {generateTimeOptions().map((timeOption) => (
+              <option key={timeOption} value={timeOption}>
+                {timeOption}
               </option>
             ))}
           </select>
@@ -99,7 +121,7 @@ const AppointmentForm = ({addAppointment}) => {
               required
               maxLength={500} // Limitar longitud
               placeholder="Describe brevemente el motivo de tu consulta"
-            ></textarea>
+              ></textarea>
           </div>
         </div>
 
@@ -114,5 +136,9 @@ const AppointmentForm = ({addAppointment}) => {
     </div>
   );
 };
+
+AppointmentForm.propTypes = {
+  addAppointment: PropTypes.func.isRequired,
+}; 
 
 export { AppointmentForm };

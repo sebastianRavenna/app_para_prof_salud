@@ -40,6 +40,17 @@ const getPatientAppointments = async () => {
     }
 }; 
 
+// 📌 Paciente obtiene los turnos ocupados
+const getBookedAppointments = async () => {
+    try {
+        const res = await api.get("/appointments/booked");
+        return res.data;
+    } catch (error) {
+        console.error("❌ Error al obtener turnos ocupados:", error.response?.data || error);
+        throw error;
+    }
+};
+
     // Cancelacion de turno (paciente y profesional)
 const cancelAppointment = async (appointmentId) => {
     try {
@@ -97,12 +108,9 @@ const updateAppointmentStatus = async (appointmentId, status) => {
 
 // Profesional (admin) ve la hist clinica
 const getClinicalHistory = async (userId) => {
-    console.log("llamando a la api para historias")
-    console.log("UserId:", userId)
     
     try {
         const res = await api.get(`/clinical-history/${userId}`);
-        console.log(res)
         return res.data;
     } catch (error) {
         console.error("❌ Error al obtener historia clínica:", error.response?.data || error);
@@ -178,7 +186,6 @@ const getAllPatients = async () => {
 const updateUser = async (userId, userData) => {
     try {
         const res = await api.put(`/users/${userId}`, userData);
-        console.log(userId);
         return res.data;
     } catch (error) {
         console.error("❌ Error al actualizar usuario:", error.response?.data || error);
@@ -223,6 +230,7 @@ const verifyCode = async (email, code) => {
         api, 
         requestAppointment, 
         getPatientAppointments, 
+        getBookedAppointments,
         cancelAppointment,
         scheduleAppointment,
         getAllAppointments, 
@@ -233,7 +241,6 @@ const verifyCode = async (email, code) => {
         removeNote,
         editNote,
         createPatient,
-        /* confirmPatient, */
         getAllPatients,
         updateUser,
         updateEmailSettings,

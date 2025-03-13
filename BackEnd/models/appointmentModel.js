@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const appointmentSchema = new mongoose.Schema({
     patient: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    date: { type: String, required: true, validate: {
+    date: { type: Date, required: true, validate: {
       validator: (value) => !isNaN(Date.parse(value)), // Verifica si es una fecha válida
       message: "Fecha inválida"
     }},

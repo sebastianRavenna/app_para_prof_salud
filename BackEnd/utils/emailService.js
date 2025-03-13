@@ -15,8 +15,6 @@ const sendVerificationEmail = async (email, code) => {
           subject: "Verificación de cuenta",
           text: `Tu código de verificación es: ${code}\nVerificá tu cuenta aquí: ${verificationLink}`
         });
-        console.log("📧 Email de verificación enviado desde", process.env.EMAIL_RESEND);
-        console.log("📧 Email de verificación enviado a", email);
         return response;
     } catch (error) {
         console.error("❌ Error enviando email:", error.response || error.message);

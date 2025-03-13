@@ -46,7 +46,6 @@ const AdminPatient = () => {
             const sortedAppointments = data.sort((a, b) => new Date(a.date) - new Date(b.date));
             setAppointments ({[patientId]: data });
             setSelectedPatientId(patientId); 
-            console.log(patientId);
         } catch (error) {
             console.error("❌ Error al obtener turnos del paciente:", error);
         }

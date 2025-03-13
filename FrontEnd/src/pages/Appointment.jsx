@@ -14,7 +14,6 @@ const Appointments = () => {
       console.warn("No hay usuario autenticado o no tiene ID");
       return;
     }
-    console.log(user.name)
     
     const fetchAppointments = async () => {
       try {

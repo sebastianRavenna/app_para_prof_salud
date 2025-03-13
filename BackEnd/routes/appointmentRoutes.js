@@ -6,6 +6,7 @@ import {
   requestAppointment, 
   cancelAppointment, 
   getPatientAppointments, 
+  getBookedAppointments,
   getAllAppointments, 
   getAppointmentsByPatient, 
   scheduleAppointment, 
@@ -18,6 +19,8 @@ const appointmentRoutes = express.Router();
 appointmentRoutes.post("/", authMiddleware, requestAppointment);
 appointmentRoutes.delete("/:id", authMiddleware, cancelAppointment);
 appointmentRoutes.get("/user", authMiddleware, getPatientAppointments);
+appointmentRoutes.get("/booked", authMiddleware, getBookedAppointments);
+
 
 // 📌 Rutas de profesional (admin)
 appointmentRoutes.get("/all", authMiddleware, adminMiddleware, getAllAppointments);

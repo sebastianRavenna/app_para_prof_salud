@@ -25,23 +25,19 @@ const registerUser = async (req, res) => {
 
 const verifyUser = async (req, res) => {
   const { email, code } = req.body;
-  console.log("Datos recibidos en el servidor:", { email, code });
 
   try {
     const user = await User.findOne({ email });
-    console.log("Usuario encontrado:", user);
 
     if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
     if (user.isVerified) return res.status(400).json({ message: "Usuario ya verificado" });
 
     if (user.verificationCode === code) {
-      console.log("Códigos coinciden, verificando usuario...");
       user.isVerified = true;
       user.verificationCode = null;
       await user.save();
       return res.status(200).json({ message: "Cuenta verificada. Ya puedes iniciar sesión." });
     } else {
-      console.log("Códigos no coinciden o usuario no encontrado.");
       return res.status(400).json({ message: "Código incorrecto" });
     }
   } catch (error) {
