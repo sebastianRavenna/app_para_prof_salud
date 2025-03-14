@@ -27,8 +27,12 @@ const AdminPanel = () => {
       try {
         if (!token) return console.error("❌ No hay token disponible");
         
-        const data = await getAllAppointments(token); 
-        setAppointments(data);
+        const data = await getAllAppointments(token);
+        const filteredAppointments = data
+        .filter(app => app.status !== "Ausente" && app.status !== "Realizado") 
+        // Ordenar los turnos cronológicamente
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+        setAppointments(filteredAppointments);
       } catch (error) {
         console.error("❌ Error al obtener turnos:", error);
       }
@@ -84,7 +88,8 @@ const AdminPanel = () => {
     } catch (error) {
         console.error("❌ Error al editar nota:", error);
     }
-};
+  };
+  
   //funcion para ELIMINAR notas de la historia clínica
   const deleteNote = async (noteId) => {
     
@@ -126,49 +131,77 @@ const AdminPanel = () => {
       if (!token) return console.error("❌ No hay token disponible");
 
       await updateAppointmentStatus(appointmentId, newStatus, token);
-      setAppointments(prevAppointments =>
-        prevAppointments.map(app =>
-          app._id === appointmentId ? { ...app, status: newStatus } : app
-        )
-      );
+      
+      // Si el estado es "Realizado" o "Ausente", lo eliminamos de la vista
+      if (newStatus === "Realizado" || newStatus === "Ausente") {
+        setAppointments(prevAppointments =>
+          prevAppointments.filter(app => app._id !== appointmentId)
+        );
+      } else {
+        // Si el estado es otro (por ejemplo, vuelve a "Pendiente"), actualizamos su estado
+        setAppointments(prevAppointments =>
+          prevAppointments.map(app =>
+            app._id === appointmentId ? { ...app, status: newStatus } : app
+          )
+        );
+      }
     } catch (error) {
       console.error("❌ Error al actualizar estado del turno:", error);
       alert("Hubo un error al cambiar el estado del turno.");
     }
   };
-
+  
+  // Función para formatear la fecha en DD/MM/AAAA
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+  
+  // Función para formatear la hora en formato 24hs (Argentina)
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'America/Argentina/Buenos_Aires'
+    });
+  };
 
   if (loading) return <div>🔄 Cargando...</div>;
 
   return (
     <Layout>
-      <section className="hero is-primary">
-        <div className="hero-body">
-          <p className="title">Panel de Administración</p>
-          <p className="subtitle">Gestionar Turnos y Evoluciones</p>
-        </div>
-      </section>
 
       <div className="container mt-5">
-        <p className="subtitle">Gestionar Turnos</p>
+      <section className="hero is-primary mb-5">
+        <div className="hero-body">
+          <p className="title">Turnos Agendados</p>
+        <p className="subtitle">Gestionar Turnos y Evoluciones</p>
+        </div>
+      </section>
         <table className="table is-striped is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th>Paciente</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Estado</th>
-              <th>Acción</th>
+              <th className="has-text-centered">Paciente</th>
+              <th className="has-text-centered">Fecha</th>
+              <th className="has-text-centered">Hora</th>
+              <th className="has-text-centered">Estado</th>
+              <th className="has-text-centered">Acción</th>
             </tr>
           </thead>
           <tbody>
             {appointments.map((appointment) => (
               <tr key={appointment._id}>
                 <td>{appointment.patient?.name || "Sin nombre"}</td>
-                <td>{appointment.date ? new Date(appointment.date).toLocaleDateString() : "Fecha no disponible"}</td>
-                <td>{appointment.date ? new Date(appointment.date).toLocaleTimeString() : "Hora no disponible"}</td>
-                <td>
-                    <select className={`select is-small
+                <td className="has-text-centered">{appointment.date ? formatDate(appointment.date) : "Fecha no disponible"}</td>
+                <td className="has-text-centered">{appointment.date ? formatTime(appointment.date) : "Hora no disponible"}</td>
+                <td className="has-text-centered">
+                    <select className={`select is-small 
                     ${appointment.status === "Pendiente" ? "has-background-warning-light" :
                     appointment.status === "Realizado" ? "has-background-success" :
                     appointment.status === "Ausente" ? "has-background-danger-light" : ""}`}
@@ -179,15 +212,14 @@ const AdminPanel = () => {
                       <option value="Ausente" >Ausente</option>  
                     </select>
                 </td>
-                <td>
-                  <div className="buttons">
+                <td className="has-text-centered">
+                  <div className="buttons is-flex is-justify-content-center">
                     <button className="button is-info is-small" onClick={() => fetchHistory(appointment.patient?._id, appointment.patient?.name)}>
                       📖 Ver Historia
                     </button>
                     <button className="button is-danger is-small" onClick={() => handleCancel(appointment._id)}>
                       ❌ Cancelar
                     </button>
-                    
                   </div>
                 </td>
               </tr>
@@ -217,7 +249,7 @@ const AdminPanel = () => {
                   history.notes?.map((note) => (
                     
                     <li key={note._id} className="box">
-                      <strong>{new Date(note.date).toLocaleDateString()}</strong>:{" "} 
+                      <strong>{new Date(note.date).toLocaleDateString('es-AR')}</strong>:{" "} 
                       {editingNoteId === note._id ? (
                         <>
                           <input

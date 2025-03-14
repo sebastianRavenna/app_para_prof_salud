@@ -144,27 +144,26 @@ const cancelAppointment = async (req, res) => {
 
 // 📌 6️⃣ Profesional agenda un turno manualmente
 const scheduleAppointment = async (req, res) => {
-    try {
-      const { patientId, date, reason, status } = req.body;
-  
-      const newAppointment = new Appointment({ 
-        patient: patientId, 
-        date, 
-        reason,
-        status
-      });
+  try {
+    const { patientId, date, reason, status } = req.body;
+    
+    // Convertir a UTC para guardar en la base de datos
+    const utcDate = zonedTimeToUtc(new Date(date), 'America/Argentina/Buenos_Aires');
 
-      await newAppointment.save();
+    const newAppointment = new Appointment({ 
+      patient: patientId, 
+      date: utcDate, 
+      reason,
+      status
+    });
 
-      /* // Enviamos un correo de confirmación al paciente y al profesional
-      sendConfirmationEmail(patient, newAppointment);
-      sendConfirmationEmail(professional, newAppointment);
-       */
-      res.status(201).json({ message: "Turno agendado por el profesional", appointment: newAppointment });
-    } catch (error) {
-      res.status(500).json({ message: "Error al agendar turno" });
-    }
-  };
+    await newAppointment.save();
+
+    res.status(201).json({ message: "Turno agendado por el profesional", appointment: newAppointment });
+  } catch (error) {
+    res.status(500).json({ message: "Error al agendar turno" });
+  }
+};
 
 // 📌 Profesional cambia el estado del turno
 const updateAppointmentStatus = async (req, res) => {
