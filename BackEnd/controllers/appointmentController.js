@@ -99,7 +99,7 @@ const cancelAppointment = async (req, res) => {
           date: localDate
         };
       });
-      
+
     res.json(appointments);
   } catch (error) {
       return res.status(500).json({ message: "Error al obtener turnos" });
@@ -109,16 +109,16 @@ const cancelAppointment = async (req, res) => {
   // 📌 Paciente obtiene los turnos ocupados
   const getBookedAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.find().select("date -_id"); // Solo obtiene la fecha
-        const bookedTimes = appointments.map(app => {
-            const localDate = new Date(app.date);
+      const appointments = await Appointment.find().select("date -_id"); // Solo obtiene la fecha
+      const bookedTimes = appointments.map(app => {
+        const localDate = new Date(app.date.toLocaleString('en-US', { timeZone: 'America/Buenos_Aires' }));
 
-            return{ 
-            date: localDate.toLocaleDateString('en-CA'), // Formato YYYY-MM-DD
-            time: localDate.toLocaleTimeString('es-AR', { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: false 
+        return{ 
+        date: localDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
+        time: localDate.toLocaleTimeString('es-AR', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
         })
       };
     });
