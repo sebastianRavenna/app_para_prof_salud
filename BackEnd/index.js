@@ -8,7 +8,12 @@ import { appointmentRoutes } from './routes/appointmentRoutes.js';
 import { articleRoutes } from './routes/articleRoutes.js';
 import { sendReminders } from './controllers/appointmentController.js';
 import { clinicalHistoryRouter } from './routes/clinicalHistoryRoutes.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// Configurar __dirname para ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -29,6 +34,9 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/uploads", express.static("uploads"));
 
 app.use('/api/users', userRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -39,7 +47,7 @@ app.get("/", (req, res) => {
   res.send("Hola mundo");
 });
 
-app.get("/test-db", async (req, res) => {
+/* app.get("/test-db", async (req, res) => {
   try {
     const mongoose = await import("mongoose");
     
@@ -58,7 +66,7 @@ app.get("/test-db", async (req, res) => {
     console.error("Error en /test-db:", error);
     res.status(500).send(`❌ No se pudo conectar a MongoDB: ${error.message}`);
   }
-});
+}); */
 
 app.listen(PORT, () => {
     console.log('Server is running');

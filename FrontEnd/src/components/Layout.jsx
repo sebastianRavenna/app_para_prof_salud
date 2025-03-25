@@ -48,6 +48,14 @@ const Layout = ({ children }) => {
                   >
                     Admin Patients
                   </Link>
+                  
+                  <Link 
+                    to="/article/new" 
+                    className={`navbar-item ${isActive("/article/new")}`}
+                  >
+                    Create Article
+                  </Link>
+                  
                 </>
               ) : user?.role === "patient" ? (
                 <Link 
@@ -57,6 +65,12 @@ const Layout = ({ children }) => {
                   Appointments
                 </Link>
               ) : null}
+              <Link 
+                to="/articles" 
+                className={`navbar-item ${isActive("/article/new")}`}
+              >
+                Articles
+              </Link>
             </div>
 
             <div className="navbar-end">

@@ -36,6 +36,13 @@
   margin-top: 1em ;
 }
 
+/* --- ADMIN PATIENT --- */
+.buttonClose{
+  position: absolute; 
+  top: 10px;
+  right: 10px
+}
+
 
 /* --- REGISTER --- */
 
@@ -95,5 +102,275 @@
     margin: 3em 7em 19em 0 
   }
 
+/* --- HISTORIA CLINICA --- */
 
+/* Estilos para el componente Historia Clínica */
+.clinical-history {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.clinical-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.clinical-history-content {
+  padding: 1rem 0;
+}
+
+.notes-list {
+  list-style: none;
+  padding: 0;
+}
+
+.note-item {
+  margin-bottom: 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.note-item:hover {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.note-content {
+  margin: 1rem 0;
+  white-space: pre-wrap;
+}
+
+.files-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.file-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.file-item-content {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.file-preview {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.file-thumbnail {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.pdf-preview, .file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #ff5252;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.file-name {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.file-date {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.file-upload-container {
+  margin-bottom: 1.5rem;
+}
+
+/* Estilos para impresión */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-area, #printable-area * {
+    visibility: visible;
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    display: block !important;
+  }
   
+  @page {
+    size: A4;
+    margin: 1,5cm;
+  }
+    
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    font-family: Arial, sans-serif;
+    color: black;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Ocultar elementos que no se deben imprimir */
+  .button, .tabs, .textarea, .file-upload-container {
+    display: none !important;
+  }
+  
+  /* Evitar que se genere una página en blanco al final */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Asegurar que el contenido imprimible tenga altura automática */
+  .clinical-print-container {
+    /* height: auto !important;
+    overflow: visible !important; */
+    page-break-after: avoid;
+    break-inside: avoid;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+  
+  /* Evitar saltos de página en medio de elementos importantes */
+  .print-notes-list li, .print-files-list li {
+    page-break-inside: avoid;
+  }
+
+  .print-notes-list::after, .print-files-list::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  /* Asegurar que las secciones inicien en una nueva página cuando sea necesario */
+  .print-section {
+    page-break-before: auto;
+    page-break-after: auto;
+    page-break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Estilos específicos para el área imprimible */
+.clinical-print-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.print-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #2d68c4;
+}
+
+.print-header h1 {
+  color: #2d68c4;
+  font-size: 24px;
+  margin: 0 0 10px 0;
+}
+
+.print-header h2 {
+  font-size: 20px;
+  margin: 0 0 10px 0;
+}
+
+.print-header p {
+  color: #777;
+  font-size: 14px;
+}
+
+.print-section {
+  margin-bottom: 30px;
+}
+
+.print-section h3 {
+  color: #2d68c4;
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.print-notes-list, .print-files-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0; /* Evitar margen extra al final de las listas */
+}
+
+.print-notes-list li {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-left: 3px solid #2d68c4;
+}
+
+.print-notes-list li:last-child,
+.print-files-list li:last-child {
+  margin-bottom: 0; /* Eliminar margen inferior del último elemento */
+}
+
+.print-files-list li {
+  padding: 8px 15px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+}
+
+.note-date {
+  font-weight: bold;
+  color: #2d68c4;
+  margin-bottom: 5px;
+}
+
+.file-name {
+  font-weight: bold;
+}
+
+.no-data {
+  display: none;
+}
+
+/* Último elemento sin margen inferior para evitar espacios en blanco */
+.print-section:last-child {
+  margin-bottom: 0;
+}

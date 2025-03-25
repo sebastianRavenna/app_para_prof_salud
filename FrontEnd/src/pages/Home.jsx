@@ -1,7 +1,31 @@
 import { Layout } from "../components/Layout"
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { ArticleDisplay } from "../components/ArticleDisplay";
+
+const API_URL = import.meta.env.VITE_BACKEND_BASEURL;
 
 const Home = () => {
+  const [latestArticles, setLatestArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchLatestArticles();
+  }, []);
+
+  const fetchLatestArticles = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/articles?limit=3`);
+      setLatestArticles(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error al cargar artículos:", error);
+      setError("No se pudieron cargar los artículos");
+      setLoading(false);
+    }
+  };
   return (
     <>
     <Layout>
@@ -25,19 +49,34 @@ Estamos aquí para ayudarte a dar el primer paso hacia el bienestar emocional. A
 
       {/* ✅ Sección de Artículos */}
       <section className="section">
-        <h2 className="title has-text-centered">Últimos Artículos</h2>
-        <div className="columns">
-          {[1, 2, 3].map((num) => (
-            <div key={num} className="column">
-              <div className="box">
-                <h3 className="subtitle">Artículo {num}</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
-                <button className="button is-link">Leer más</button>
-              </div>
+          <h2 className="title has-text-centered">Últimos Artículos</h2>
+          
+          {loading ? (
+            <div className="has-text-centered">
+              <p>Cargando artículos...</p>
+              <progress className="progress is-primary" max="100"></progress>
             </div>
-          ))}
-        </div>
-      </section>
+          ) : error ? (
+            <div className="notification is-danger">
+              {error}
+            </div>
+          ) : latestArticles.length === 0 ? (
+            <div className="notification is-info has-text-centered">
+              No hay artículos disponibles
+            </div>
+          ) : (
+            <div className="columns">
+              {latestArticles.map((article) => (
+                <div key={article._id} className="column">
+                  <ArticleDisplay 
+                    article={article} 
+                    isPreview={true} 
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
       {/* ✅ Contacto y Mapa */}
       <section className="section">

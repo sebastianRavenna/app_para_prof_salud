@@ -16,6 +16,17 @@ const ClinicalHistorySchema = new mongoose.Schema(
         note: String,
       },
     ],
+    files: [{
+      filename: String,
+      path: String,
+      url: String,
+      mimetype: String,
+      size: Number,
+      uploadDate: {
+        type: Date,
+        default: Date.now
+      }
+    }]
   },
   { timestamps: true }
 );

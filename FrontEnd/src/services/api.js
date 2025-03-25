@@ -225,8 +225,82 @@ const verifyCode = async (email, code) => {
     }
 };
 
+// Upload a file to a patient's clinical history
+const uploadFile = async (patientId, file) => {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Configuración especial para archivos
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }; 
+        
+        const res = await api.post(`/clinical-history/${patientId}/files`, formData, config);
+        return res.data;
+    } catch (error) {
+        console.error("Error al subir el archivo", error);
+        throw error;
+    }
+};
 
-    export { 
+// Get all files for a patient's clinical history
+const getPatientFiles = async (patientId) => {
+    try {
+        const res = await api.get(`/clinical-history/${patientId}/files`);
+        return res.data;
+    } catch (error) {
+        console.error("Error al obtener los archivos", error);
+        throw error;
+    }
+};
+
+// Delete a file from a patient's clinical history
+const deleteFile = async (patientId, fileId) => {
+    try {
+        const res = await api.delete(`/clinical-history/${patientId}/files/${fileId}`);
+        return res.data;
+    } catch (error) {
+        console.error("Error al eliminar el archivo", error);
+        throw error;
+    }
+};
+  // Obtener todos los artículos
+const getAllArticles = async () => {
+    const response = await api.get(API_URL);
+    return response.data;
+  };
+  
+  // Obtener un artículo por ID
+  const getArticleById = async (id) => {
+    const response = await api.get(`${API_URL}/${id}`);
+    return response.data;
+  };
+  
+  // Crear un nuevo artículo
+  const createArticle = async (formData) => {
+    const response = await api.post(API_URL, formData, {
+      headers: { "Content-Type": "multipart/form-data"}
+    });
+    return response.data;
+  };
+  
+  // Actualizar un artículo
+  const updateArticle = async (id, formData) => {
+    const response = await api.put(`${API_URL}/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+    return response.data;
+  };
+  
+  // Eliminar un artículo
+  const deleteArticle = async (id) => {
+    await api.delete(`${API_URL}/${id}`, {
+    });
+  };
+    export{ 
         api, 
         requestAppointment, 
         getPatientAppointments, 
@@ -245,5 +319,13 @@ const verifyCode = async (email, code) => {
         updateUser,
         updateEmailSettings,
         getEmailSettings,
-        verifyCode
+        verifyCode,
+        uploadFile,
+        getPatientFiles,
+        deleteFile,
+        deleteArticle,
+        updateArticle,
+        createArticle,
+        getArticleById,
+        getAllArticles,
     };

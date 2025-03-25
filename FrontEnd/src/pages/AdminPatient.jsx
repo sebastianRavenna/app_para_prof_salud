@@ -6,7 +6,8 @@ import {
   getAppointmentsByPatient, 
   scheduleAppointment, 
   cancelAppointment,
-  getBookedAppointments
+  getBookedAppointments,
+  updateAppointmentStatus 
   } from "../services/api";
 import { Layout } from "../components/Layout";
 
@@ -121,13 +122,24 @@ const AdminPatient = () => {
         }
     };
 
+    const handleStatusChange = async (appointmentId, newStatus, patientId) => {
+        if (!window.confirm("¿Seguro que quieres cambiar el estado de este turno?")) return;
+        try {
+            await updateAppointmentStatus(appointmentId, newStatus);
+            // Refresh the appointments after status update
+            fetchAppointments(patientId);
+        } catch (error) {
+            console.error("❌ Error al actualizar estado del turno:", error);
+            alert("Hubo un error al cambiar el estado del turno.");
+        }
+    };
+
     const closeAppointmentsView = (patientId) => {
         const updatedAppointments = {...appointments};
         delete updatedAppointments[patientId];
         setAppointments(updatedAppointments);
     };
 
-    // Obtain today's date in YYYY-MM-DD format for min date attribute
     const today = new Date().toISOString().split('T')[0];
 
     return (
@@ -185,35 +197,39 @@ const AdminPatient = () => {
 
             {Object.keys(appointments).map((patientId) => (
                 <div key={patientId} className="box" style={{ position: 'relative' }}>
-                    {/* Botón X para cerrar */}
                     <button 
                         onClick={() => closeAppointmentsView(patientId)} 
-                        className="delete is-medium" 
-                        style={{ position: 'absolute', top: '10px', right: '10px' }}
+                        className="delete is-medium buttonClose" 
                         aria-label="close"
                     ></button>
                     
-                    <div className="select mb-3">
-                        <select value={appointmentFilter} onChange={(e) => setAppointmentFilter(e.target.value)}>
-                            <option value="all">Todos</option>
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="Realizado">Realizado</option>
-                            <option value="Ausente">Ausente</option>
-                        </select>
-                    </div>
                     <h3 className="title is-5">Turnos de {patients.find(p => p._id === patientId)?.name}</h3>
                     <table className="table is-fullwidth">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
                                 <th>Motivo</th>
-                                <th>Estado</th>
+                                <th className="is-flex is-align-items-center">
+                                    Estado
+                                    <div className="select is-small ml-2">
+                                        <select 
+                                        value={appointmentFilter} 
+                                        onChange={(e) => setAppointmentFilter(e.target.value)}
+                                        aria-label="Filtrar por estado">
+                                        <option value="all">Todos</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="Realizado">Realizado</option>
+                                        <option value="Ausente">Ausente</option>
+                                        </select>
+                                    </div>
+                                </th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {appointments[patientId].filter((a) => appointmentFilter === "all" || a.status === appointmentFilter)
-                                    .map((appointment) => (
+                            {appointments[patientId]
+                            .filter((a) => appointmentFilter === "all" || a.status === appointmentFilter)
+                            .map((appointment) => (
                                 <tr key={appointment._id}>
                                     <td>
                                         <span style={{ fontWeight: "bold", marginRight: "10px" }}>
@@ -223,12 +239,20 @@ const AdminPatient = () => {
                                     </td>
                                     <td>{appointment.reason}</td>
                                     <td> 
-                                        <div className={`is-medium tag
-                                            ${appointment.status === "Pendiente" ? "has-background-warning-light" :
-                                            appointment.status === "Realizado" ? "has-background-success" :
-                                            appointment.status === "Ausente" ? "has-background-danger-light" : ""}`}
-                                        >
-                                            {appointment.status}
+                                    <div className="select">
+                                            <select
+                                                value={appointment.status}
+                                                onChange={(e) => handleStatusChange(appointment._id, e.target.value, patientId)}
+                                                className={`
+                                                    ${appointment.status === "Pendiente" ? "has-background-warning-light" :
+                                                    appointment.status === "Realizado" ? "has-background-success" :
+                                                    appointment.status === "Ausente" ? "has-background-danger-light" : ""}
+                                                `}
+                                            >
+                                                <option value="Pendiente">Pendiente</option>
+                                                <option value="Realizado">Realizado</option>
+                                                <option value="Ausente">Ausente</option>
+                                            </select>
                                         </div>
                                     </td>
                                     <td>
