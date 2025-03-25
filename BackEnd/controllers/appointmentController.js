@@ -91,6 +91,15 @@ const cancelAppointment = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const appointments = await Appointment.find({ patient: decoded.id });
     
+    const localAppointments = appointments.map(app => {
+      const localDate = new Date(app.date);
+      localDate.setHours(localDate.getHours() - 3);
+        return {
+          ...app.toObject(), // Convert Mongoose document to plain object
+          date: localDate
+        };
+      });
+      
     res.json(appointments);
   } catch (error) {
       return res.status(500).json({ message: "Error al obtener turnos" });
