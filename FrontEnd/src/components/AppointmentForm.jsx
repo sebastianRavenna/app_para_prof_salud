@@ -9,7 +9,8 @@ const AppointmentForm = ({addAppointment}) => {
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState("");
   const [bookedTimes, setBookedTimes] = useState([])
-  
+  const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     if (!date) return;
 
@@ -33,9 +34,22 @@ const AppointmentForm = ({addAppointment}) => {
   // Generar horarios disponibles filtrando los ocupados
   const generateTimeOptions = () => {
     const options = [];
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
     for (let hour = 8; hour <= 18; hour++) {
       ["00", "30"].forEach(min => {
         const timeSlot = `${hour.toString().padStart(2, "0")}:${min}`;
+        
+        // If date is today, filter out past times
+        if (date === today) {
+          const [slotHour, slotMinute] = timeSlot.split(':').map(Number);
+          if (slotHour < currentHour || (slotHour === currentHour && Number(slotMinute) <= currentMinute)) {
+            return; // Skip this time slot
+          }
+        }
+        
         if (!bookedTimes.includes(timeSlot)) {
           options.push(timeSlot);
         }
@@ -82,31 +96,40 @@ const AppointmentForm = ({addAppointment}) => {
       <h2 className="title is-4">Solicitar Turno</h2>
       {message && <p className="notification">{message}</p>}
       <form onSubmit={handleAppointmentRequest}>
-      <div className="field">
-      <label className="label">Fecha</label>
-      <div className="control">
-        <input
-          className="input"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-          />
-      </div>
-    </div>
+        <div className="field">
+          <label className="label">Fecha</label>
+          <div className="control">
+            <input
+              className="input"
+              type="date"
+              value={date}
+              min={today}  // Prevent selecting past dates
+              onChange={(e) => {
+                setDate(e.target.value);
+                setTime(""); // Reset time when date changes
+              }}
+              required
+            />
+          </div>
+        </div>
 
-    <div className="field">
-      <label className="label">Hora</label>
-      <div className="control">
-        <div className="select">
-          <select value={time} onChange={(e) => setTime(e.target.value)} required>
-            <option value="">Selecciona una hora</option>
-            {generateTimeOptions().map((timeOption) => (
-              <option key={timeOption} value={timeOption}>
-                {timeOption}
-              </option>
-            ))}
-          </select>
+        <div className="field">
+          <label className="label">Hora</label>
+          <div className="control">
+            <div className="select">
+              <select 
+                value={time} 
+                onChange={(e) => setTime(e.target.value)} 
+                required
+                disabled={!date}
+              >
+                <option value="">Selecciona una hora</option>
+                {generateTimeOptions().map((timeOption) => (
+                  <option key={timeOption} value={timeOption}>
+                    {timeOption}
+                  </option>
+                ))}
+              </select>
         </div>
       </div>
     </div>
