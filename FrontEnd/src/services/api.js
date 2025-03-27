@@ -1,6 +1,8 @@
 import axios from "axios";
-    
+import { formatInTimeZone  } from 'date-fns-tz';
+
 const API_URL=import.meta.env.VITE_BACKEND_BASEURL;
+const timeZone = 'America/Argentina/Buenos_Aires';
 
 const api = axios.create({
     baseURL: `${API_URL}/api`,
@@ -21,7 +23,13 @@ api.interceptors.request.use((config) => {
 // 📌 Paciente solicita un turno
 const requestAppointment = async (date, reason) => {
     try {
-        const res = await api.post("/appointments", { date, reason });
+        // Convertir la fecha al huso horario deseado
+        const utcDate = formatInTimeZone(new Date(date), timeZone, "yyyy-MM-dd'T'HH:mm:ssXXX");
+        
+        const res = await api.post("/appointments", { 
+            date: utcDate, 
+            reason 
+        });
         return res.data;
     } catch (error) {
         console.error("❌ Error al solicitar turno:", error.response?.data || error);

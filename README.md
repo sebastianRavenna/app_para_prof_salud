@@ -77,14 +77,6 @@ El backend correrá en **http://localhost:5000**.
 
 ---
 
-## 💡 **Próximos Pasos**
-Después de completar la funcionalidad básica, se pueden agregar mejoras como:
-- Implementación de JWT para autenticación más robusta
-- Integración con frontend
-- Implementación en la nube con MongoDB Atlas
 
-📌 **Siguiente tarea:** **Gestión de turnos** 📅
 
----
-
-**¡seguimos avanzando! 🚀**
+Eliminar el CANCELAR en appointments cuando el turno ya esta vencido

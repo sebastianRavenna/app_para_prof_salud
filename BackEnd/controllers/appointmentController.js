@@ -4,46 +4,66 @@ import { emailTemplates } from '../utils/emailTemplates.js';
 import { User } from '../models/userModel.js'
 import { ClinicalHistory } from '../models/clinicalHistoryModel.js';
 import jwt from 'jsonwebtoken';
+import { formatInTimeZone } from "date-fns-tz";
 
 // 📌 1️⃣ Paciente solicita un turno
 const requestAppointment = async (req, res) => {
-    try {
-      const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+  try {
+    const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
     if (!token) {
       return res.status(401).json({ message: "No autorizado, falta autenticación." });
     }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const patientId = decoded.id;
-      
-      const { date, reason } = req.body;
-      let history = await ClinicalHistory.findOne({ user: patientId });
-
-      if (!history) {
-        // Si no existe, la creamos
-        history = new ClinicalHistory({ user: patientId });
-        await history.save();
-      }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const patientId = decoded.id;
     
-      const newAppointment = new Appointment({ 
-        patient: patientId, date: new Date(date), reason });
-      await newAppointment.save();
-      
-      const patient = await User.findById(patientId);
-      const formattedDate = new Date(date).toLocaleString("es-AR");
-      
-      //envio de mail
-      await sendEmail(
+    const { date, reason } = req.body;
+
+    // Enhanced logging and validation
+    console.log('Received appointment request:', { patientId, date, reason });
+
+    if (!date || !reason) {
+      return res.status(400).json({ message: "Fecha y motivo son requeridos" });
+    }
+
+    let history = await ClinicalHistory.findOne({ user: patientId });
+
+    if (!history) {
+      history = new ClinicalHistory({ user: patientId });
+      await history.save();
+    }
+
+    // Improved date handling
+    const utcDate = new Date(date);
+    const localDate = formatInTimeZone(utcDate, 'America/Argentina/Buenos_Aires', "yyyy-MM-dd'T'HH:mm:ssXXX");
+    
+    const newAppointment = new Appointment({ 
+      patient: patientId, 
+      date: localDate, 
+      reason 
+    });
+    
+    await newAppointment.save();
+    
+    const patient = await User.findById(patientId);
+    const formattedDate = new Date(date).toLocaleString("es-AR");
+    
+    await sendEmail(
       patient.email,
       "Confirmación de Turno",
       emailTemplates.appointmentBooked(patient.username, formattedDate)
-      );
-    
-      res.status(201).json({ message: "Turno solicitado", appointment: newAppointment });
-    } catch (error) {
-      res.status(500).json({ message: "Error al solicitar turno" });
-    }
-  };
+    );
+  
+    res.status(201).json({ message: "Turno solicitado", appointment: newAppointment });
+  } catch (error) {
+    console.error("Detailed appointment request error:", error);
+    res.status(500).json({ 
+      message: "Error al solicitar turno", 
+      errorDetails: error.message 
+    });
+  }
+};
+
 // 📌 Paciente cancela su turno
 const cancelAppointment = async (req, res) => {
     try {
