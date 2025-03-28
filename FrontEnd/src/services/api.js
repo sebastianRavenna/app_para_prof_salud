@@ -70,10 +70,22 @@ const cancelAppointment = async (appointmentId) => {
     }
 };
 
-// 📌 Profesional agenda un turno manualmente
+// 📌 Api.js Profesional agenda un turno manualmente
 const scheduleAppointment = async (patientId, date, reason) => {
     try {
-        const res = await api.post("/appointments/schedule", { patientId, date, reason });
+        if (!date || isNaN(new Date(date).getTime())) {
+            throw new Error('Invalid date format');
+        }
+        // Convert the date to a standard ISO string
+        // This ensures consistent formatting across different environments
+        const formattedDate = new Date(date).toISOString();
+
+        const res = await api.post("/appointments/schedule", { 
+            patientId,
+            date: formattedDate,
+            reason,
+            status: "Pendiente"
+        });
         return res.data;
     } catch (error) {
         console.error("❌ Error al agendar turno:", error.response?.data || error);

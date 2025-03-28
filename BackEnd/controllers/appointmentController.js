@@ -171,28 +171,116 @@ const cancelAppointment = async (req, res) => {
     }
   };
 
-// 📌 6️⃣ Profesional agenda un turno manualmente
+// 📌 Controller.js Profesional agenda un turno manualmente
 const scheduleAppointment = async (req, res) => {
-  try {
-    const { patientId, date, reason, status } = req.body;
-    
-    // Convertir a UTC para guardar en la base de datos
-    const utcDate = zonedTimeToUtc(new Date(date), 'America/Argentina/Buenos_Aires');
+    try {
+        const { patientId, date, reason } = req.body;
 
+        // Validate inputs
+        if (!patientId || !date) {
+            return res.status(400).json({ message: "Paciente y fecha son requeridos" });
+        }
+
+        // Verify patient exists
+        const patient = await User.findById(patientId);
+        if (!patient) {
+            return res.status(404).json({ message: "Paciente no encontrado" });
+        }
+
+        // Ensure clinical history exists
+        let history = await ClinicalHistory.findOne({ user: patientId });
+        if (!history) {
+            history = new ClinicalHistory({ user: patientId });
+            await history.save();
+        }
+
+        // Convert date to local timezone
+        const localDate = formatInTimeZone(
+            new Date(date), 
+            'America/Buenos_Aires', 
+            "yyyy-MM-dd'T'HH:mm:ssXXX"
+        );
+
+        /* // Check for existing appointment at the same time
+        const existingAppointment = await Appointment.findOne({ 
+            patient: patientId, 
+            date: localDate 
+        });
+
+        if (existingAppointment) {
+            return res.status(400).json({ message: "Ya existe un turno para este paciente en esta fecha y hora" });
+        }
+ */
+        // Create new appointment
+        const newAppointment = new Appointment({ 
+            patient: patientId, 
+            date: localDate, 
+            reason,
+            status:"Pendiente"
+        });
+        
+        await newAppointment.save();
+
+        // Send confirmation email
+        const formattedDate = new Date(localDate).toLocaleString("es-AR");
+        await sendEmail(
+            patient.email,
+            "Turno Agendado",
+            emailTemplates.appointmentBooked(patient.username, formattedDate)
+        );
+    
+        res.status(201).json({ 
+            message: "Turno agendado exitosamente", 
+            appointment: newAppointment 
+        });
+
+    } catch (error) {
+        console.error("Error al agendar turno:", error);
+        res.status(500).json({ 
+            message: "Error al agendar turno", 
+            errorDetails: error.message 
+        });
+    }
+};
+
+/* const scheduleAppointment = async (req, res) => {
+  try {
+    const { patientId, date, reason } = req.body;
+    console.log('Fecha recibida en scheduleAppointment:', date);
+    
+    // Validate input
+    if (!patientId || !date || !reason) {
+      return res.status(400).json({ message: "Paciente, fecha y motivo son requeridos" });
+    }
+
+    // Improved date handling
+    const utcDate = new Date(date);
+    const localDate = formatInTimeZone(utcDate, 'America/Buenos_Aires', "yyyy-MM-dd'T'HH:mm:ssXXX"); 
+    console.log(firstDate, 'Fecha convertida a UTC:', localDate);
     const newAppointment = new Appointment({ 
       patient: patientId, 
-      date: utcDate, 
+      date: localDate, 
       reason,
-      status
+      status: "Pendiente" 
     });
-
+    
     await newAppointment.save();
+    
+    //const patient = await User.findById(patientId);
+    //const formattedDate = new Date(date).toLocaleString("es-AR");
 
-    res.status(201).json({ message: "Turno agendado por el profesional", appointment: newAppointment });
+    res.status(201).json({ 
+      message: "Turno agendado por el profesional", 
+      appointment: newAppointment 
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error al agendar turno" });
+    console.error("Error al agendar turno:", error);
+    res.status(500).json({ 
+      message: "Error al agendar turno", 
+      errorDetails: error.message 
+    });
   }
-};
+}; */
 
 // 📌 Profesional cambia el estado del turno
 const updateAppointmentStatus = async (req, res) => {
